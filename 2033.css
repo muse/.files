@@ -1,0 +1,180 @@
+/* Mirko van der Waal */
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+
+/* Hide all this bullshit */
+.toolbarbutton-menubutton-dropmarker,
+.tabs-newtab-button,
+#abp-toolbarbutton,
+#addonbar-closebutton,
+#appmenu-toolbar-button,
+#back-button,
+#bookmarks-menu-button,
+#downloads-button,
+#forward-button,
+#go-button,
+#home-button,
+#identity-box,
+#identity-icon-labels,
+#minimize-button,
+#notification-popup-box,
+#page-proxy-favicon,
+#PanelUI-button,
+#restore-button,
+#searchbar,
+#star-button,
+#stylish-toolbar-button,
+#tabbrowser-tabs .scrollbutton-down,
+#tabbrowser-tabs .scrollbutton-up,
+#urlbar-container dropmarker,
+#urlbar-go-button,
+#urlbar-reload-button,
+#urlbar-stop-button,
+statusbarpanel 
+{
+  display: none !important;
+}
+
+.tab-background-start, 
+.tab-background-end 
+{
+  visibility: hidden !important;
+}
+
+.tab-background,
+.tab-background-middle,
+.tabbrowser-tab:after,
+.tabbrowser-tab:before,
+.tabbrowser-tab:after 
+{
+  box-shadow: none !important;
+  background: none !important;
+}
+
+/* Remove the scrollbar. */
+#content browser
+{
+  margin-right:-14px!important;overflow-y:scroll;overflow-x:hidden;
+}
+
+/* Handle the TABS. */
+#TabsToolbar 
+{
+  height: 32px !important;
+  margin-left: -20px !important;
+  margin-right: -20px ! important;
+}
+
+tab 
+{
+  font-family: "GohuFont" !important;
+  font-size: 9pt !important;
+  text-align: center !important;
+}
+
+#main-window #tabbrowser-tabs tab[fadein]:not([pinned]) 
+{
+  max-width: 100% !important;
+}
+
+.tabbrowser-tab:not([pinned]) .tab-throbber,
+.tabbrowser-tab .tab-close-button,
+.tabbrowser-tab:not([pinned]) .tab-icon-image 
+{
+   visibility: hidden !important;
+}
+
+/* Standard */
+#main-window .tabbrowser-tab:not(:-moz-lwtheme)  
+{
+  background-color: #222222 !important;
+  color: #BBEECC !important;
+}
+
+/* Hover */
+#main-window .tabbrowser-tab:hover 
+{
+  background-color: #363636 !important;
+  color: #BBEEBB !important;
+}
+
+/* Active */
+#main-window .tabbrowser-tab[selected] 
+{
+  background-color: #131313 !important;
+  color: #BBFFDD !important;
+}
+
+/* New URL*/
+#nav-bar 
+{
+  background: #222222 !important;
+  bottom: 0px !important;
+  box-shadow: none !important;
+  height: 32px !important;
+  position: fixed !important;
+  width: 100% !important;
+}
+
+/* Old URL*/
+#urlbar 
+{
+  text-align:center !important;
+  background: none !important;
+  border: none !important;
+  color: #BBFFDD !important;
+  font-family: "GohuFont" !important;
+  font-size: 9pt !important;
+  height: 16px !important;
+  margin-left: 9px !important;
+  margin-top: 6px !important;
+  width: 100vw !important;
+}
+
+#content-deck 
+{
+  margin-bottom: 32px !important;
+}
+
+#PopupAutoCompleteRichResult 
+{
+  padding: 0px !important;
+  overflow-y:hidden !important;
+  margin-top: 11.5px !important;
+  font-family: "GohuFont" !important;
+  font-size: 75% !important;
+  height: 160px !important;
+}
+#PopupAutoCompleteRichResult richlistitem,
+#PopupAutoCompleteRichResult richlistitem *
+{  
+  height: 20px !important;
+  background: #131313 !important;
+  color:      #BBFFDD !important;
+  margin: 0px 0px 0px 0px!important;
+  padding:1px 0px 1px 2px!important;
+}
+#PopupAutoCompleteRichResult richlistitem[selected="true"] *
+{
+  background: #222222 !important;
+  color:      #BBEECC !important;
+}
+#PopupAutoCompleteRichResult richlistitem .ac-site-icon
+{
+  display: none !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
