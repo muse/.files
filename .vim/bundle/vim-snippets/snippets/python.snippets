@@ -1,0 +1,186 @@
+# A few of the snippets make use of .vimrc bound variables.
+# If any snippets fail consider checking those first!
+
+# By default the shebang should be included in the templates.
+snippet #!2
+	#! /usr/bin/env python2
+
+snippet #!3
+	#! /usr/bin/env python3
+
+snippet import
+	import ${0:module}
+
+snippet from
+	from ${1:package} import ${0:module}
+
+# Import the exit module as die for further reference.
+# A user preference rather than a actually useful one.
+snippet die
+	from sys import exit as die
+
+# (D)ocstring (mod)ule
+snippet dmod
+	"""	
+	@Author: `g:snips_author_short`
+	@Main: ${1:name}	
+	
+	@Module: `vim_snippets#Directory('$1')`/`vim_snippets#Filename('$1.py')`
+	@Description: 
+		${0}
+	"""
+
+# (D)ocstring (main)
+snippet dmain
+	"""
+	@Author: `g:snips_author_long` || `g:snips_author_short`
+	@License: ${1:MIT}
+	
+	@Email: `g:snips_email`
+	@Github: `g:snips_github`
+
+	@File: `vim_snippets#Filename('$1.py')`
+	@Description:
+		${0}
+	"""
+
+snippet while
+	while ${1:condition}:
+		${0}
+
+# dowhile mimics do...while in nearly any other language.
+snippet dowhile
+	while True:
+		${1}
+		if ${0:condition}:
+			break
+
+snippet with
+	with ${1:expression} as ${2:var}:
+		${0}
+
+# Create a new class.
+snippet class
+	class ${1:name}:
+		"""${2:description of $1}"""
+		def __init__(self):
+			${0}
+
+# Create a new class that optionally inherits an object.
+snippet classo
+	class ${1:name}(${2:object}):
+		"""${3:description of $1}"""
+		def __init__(self):
+			${0}
+
+# New function.
+snippet def
+	def ${1:name}(${2:`indent('.') ? 'self' : ''`}):
+		"""${3:description of $1}"""
+		${0}
+
+# New method.
+snippet method
+	def ${1:name}(self, ${2:arg}):
+		"""${3:description of $1}"""
+		${0}
+
+# New __unicode__ method.
+# Unicode is a pretty default method and is usually not changed.
+# Thus it recieves its own snippet, what an honor.
+snippet uni
+	def __unicode__(self, ${1:*args}):
+		${0:return unicode()}
+
+# New __magic__ method.
+snippet __
+	__${1:init}__
+
+# New lambda.
+snippet lambda
+	${1:var} = lambda ${2:vars}: ${0:}
+
+# New property.
+snippet property
+	def ${1:foo}():
+		doc = "${2:The $1 property.}"
+		def fget(self):
+			${3:return self._$1}
+		def fset(self, value):
+			${4:self._$1 = value}
+		def fdel(self):
+			${0:del self._$1}
+		return locals()
+	$1 = property(**$1())
+
+# If statement.
+snippet if
+	if ${1:condition}:
+		${0}
+
+snippet elif
+	elif ${1:condition}:
+		${0}
+
+snippet else
+	else:
+		${0}
+
+# For loop.
+snippet for
+	for ${1:item} in ${2:items}:
+		${0}
+
+snippet range
+	for y in range(${1}):
+		${0}
+
+snippet xrange
+	for y in xrange(${1}):
+		${0}
+
+# File encoding.
+snippet cutf8
+	# -*- coding: utf-8 -*-
+
+snippet cascii
+	# -*- coding: ascii -*-
+	
+snippet try
+	try:
+		${1}
+
+	except ${2:Exception} as ${3:e}:
+		${0:raise $3}
+		
+# if __name__ == '__main__':
+# Only runs the code when the file is main.
+snippet ifmain
+	if __name__ == '__main__':
+		${0:main()}
+
+# assert __name__ == '__main__'
+# Asserts with AssertionError when the file is not main.
+snippet asmain
+	assert __name__ == '__main__'
+
+# Module snippets.
+# New getopt statement. (Requires the getopt module)
+# from getopt import getopt
+# Importing with 'from' will allow us to call the object if it were default.
+snippet getopt
+	try:
+		# Short option syntax: "hv:"
+		# Long option syntax: "help" or "verbose="
+		opts, args = getopt(sys.argv[1:], "${1:short_options}", [${2:long_options}])
+
+	except GetoptError, err:
+		# Print debug info
+		print str(err)
+		${3:error_action}
+
+	for option, argument in opts:
+		if option in ("-h", "--help"):
+			${0}
+		elif option in ("-v", "--verbose"):
+			verbose = argument

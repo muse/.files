@@ -1,4 +1,3 @@
-" Mirko van der Waal
 syntax enable
 
 " basic settings
@@ -25,9 +24,11 @@ set softtabstop=4
 set backspace=eol,start,indent
 set colorcolumn=80
 filetype plugin indent on
+
 " new splits default to right, or below
 set splitbelow
 set splitright
+
 " tabs for makefiles
 autocmd FileType make setlocal noexpandtab
 
@@ -36,7 +37,7 @@ autocmd BufNewFile,BufRead *.json set ft=javascript
 autocmd BufNewFile,BufRead *.md set ft=markdown spell
 
 let g:clipbrdDefaultReg = '+'
-colorscheme dc2
+colorscheme 2033
 set cursorline
 set nowrap
 set title
@@ -59,9 +60,12 @@ set clipboard=unnamedplus,unnamed
 " set clipboard+=unnamed
 
 " Automatically source vimrc on save.
-autocmd! bufwritepost $MYVIMRC source $MYVIMRC
+augroup reload_vimrc " {
+    autocmd!
+    autocmd BufWritePost $MYVIMRC source $MYVIMRC
+augroup END " }
 
-" enable utf8
+" Enable utf8
 set encoding=utf8
 set termencoding=utf-8
 
@@ -172,10 +176,17 @@ vnoremap K :m '<-2<CR>gv=gv
 " switching between tab modes
 nmap <Leader>t :set expandtab tabstop=4 shiftwidth=4 softtabstop=4<CR>
 nmap <Leader>T :set expandtab tabstop=8 shiftwidth=8 softtabstop=4<CR>
-" remove ^M
-nnoremap <Leader>m :%s/^M//g
 
-" space after comment
+" remove ^M
+nnoremap <Leader>m :%s/<cr>//g
+
+" Snippet variables.
+let g:snips_author_short= 'Mvdw'
+let g:snips_author_long = 'Mirko van der Waal'
+let g:snips_email = '<Mirkovdw@outlook.com>'
+let g:snips_github= 'https://github.com/Imakethings/'
+
+" Create one space after a commit sign.
 let NERDSpaceDelims=1
 
 " matchtag custom color
@@ -196,6 +207,6 @@ let g:airline_theme='raven'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#fnamemod = ':t'
 
-
 set scrolloff=5
 set sidescroll=5
+
