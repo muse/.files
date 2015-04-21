@@ -1,6 +1,5 @@
 # A few of the snippets make use of .vimrc bound variables.
 # If any snippets fail consider checking those first!
-
 # By default the shebang should be included in the templates.
 snippet #!2
 	#! /usr/bin/env python2
@@ -22,28 +21,24 @@ snippet die
 # (D)ocstring (mod)ule
 snippet dmod
 	"""	
-	@Author: `g:snips_author_short`
-	@Main: ${1:name}	
-	
-	@Module: `vim_snippets#Directory('$1')`/`vim_snippets#Filename('$1.py')`
-	@Description: 
+	Author: `g:snips_author_short`
+	Main:   ${1:Name}		
+	Module: `vim_snippets#Directory('$1')`/`vim_snippets#Filename('$1')`
+	Description: 
 		${0}
 	"""
 
 # (D)ocstring (main)
 snippet dmain
 	"""
-	@Author: `g:snips_author_long` || `g:snips_author_short`
-	@License: ${1:MIT}
-	
-	@Email: `g:snips_email`
-	@Github: `g:snips_github`
-
-	@File: `vim_snippets#Filename('$1.py')`
-	@Description:
+	Author:	`g:snips_author_long`
+	License:${1:MIT}
+	Email:	`g:snips_email`
+	Github: `g:snips_github`
+	File:	`vim_snippets#Filename('$1.py')`
+	Description:
 		${0}
 	"""
-
 snippet while
 	while ${1:condition}:
 		${0}
