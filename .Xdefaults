@@ -1,0 +1,90 @@
+!! Mirko van der Waal
+!! Are actual comments.
+!  Are alternatively commented options.
+
+!! Fonts to use, Only allows one.
+
+!! Pretty nice and wide, Good for clearer reading. 
+!URxvt.font: xft:ProggyCleanTT:size=12
+
+!! My default font.
+URxvt.font: xft:GohuFont:size=9
+
+!! Back and foreground color defaults.
+URxvt.background: #222222
+URxvt.foreground: #BBEECC
+
+!! Other standard colors.
+URxvt.colorBD:    #CFCFCF
+URxvt.colorUL:    #A0A0A0
+URxvt.colorIT:    #686868
+
+!! BLK
+!URxvt.color0:      #303030
+!URxvt.color8:     #686868
+URxvt.color0:      #333333
+URxvt.color8:      #3D3D3D
+
+!! RED
+!URxvt.color9:     #FFA7DA
+!URxvt.color1:     #D370A3
+URxvt.color9:      #BF4D80
+URxvt.color1:      #8C4665
+
+!! GRN
+!URxvt.color10:    #A3D572
+!URxvt.color2:     #6D9E3F
+URxvt.color2:      #287373
+URxvt.color10:     #53A6A6
+
+!! BLU
+!URxvt.color12:    #98CBFE
+!URxvt.color4:     #6095C5
+URxvt.color4:      #395573
+URxvt.color12:     #477AB3
+
+!! YEL
+!URxvt.color11:    #EFBD8B
+!URxvt.color3:     #B58858
+URxvt.color3:      #7E5D7A
+URxvt.color11:     #A270A3
+
+!! CYN
+!URxvt.color14:    #75DAA9
+!URxvt.color6:     #31658C
+URxvt.color14:     #6096BF
+URxvt.color6:      #3BA275
+
+!! MAG
+!URxvt.color13:    #E5B0FF
+!URxvt.color5:     #AC7BDE
+URxvt.color5:      #5E468C
+URxvt.color13:     #7E62B3
+
+!! WHT
+!URxvt.color7:     #CFCFCF
+!URxvt.color15:    #FFFFFF
+URxvt.color7:      #899CA1
+URxvt.color15:     #C0C0C0
+
+!! Default text re-assignment options.
+Xft.dpi:96                                                                      
+URxvt.letterSpace:1.2
+Xft.antialias:1                                                                 
+Xft.hinting:1                                                                   
+Xft.hintstyle:hintslight                                                        
+Xft.rgba:rgb                                                                    
+Xft.lcdfilter:lcddefault                                                        
+
+!! Enabling clickable links:
+URxvt.perl-ext-common: default,matcher
+URxvt.url-launcher: /usr/bin/firefox
+URxvt.matcher.button: 1
+
+!! URxvt scrolling options and cursor style:
+URxvt*saveLines:            12000
+URxvt*scrollstyle:          plain
+URxvt*scrollBar:            false
+URxvt*cursorBlink:          true
+URxvt*cursorUnderline:      false
+

@@ -1,212 +1,101 @@
-syntax enable
+" Author: Mirko van der Waal
+" Email: <mvdw at airmail dot cc>
+" Decided to start building this .vimrc from scratch.
+" It were about time because the other ones were so filled with crap.
+" If any of the following things are unclear, most can be solved with <:help arg>
 
-" basic settings
-set nocompatible
-set autoread
-set autoindent
-set hidden
-set smarttab
-set wildmode=list:longest,full
-set showmatch
-set wildmenu
-set ruler
-set smartindent
-set tabstop=4
-set shiftwidth=4
-set expandtab
-set wildignore=*.o,*~,*.pyc
-set number
-set ttyfast
-set lazyredraw
-set showcmd
-set iskeyword+=-
-set softtabstop=4
-set backspace=eol,start,indent
-set colorcolumn=80
-filetype plugin indent on
+set encoding=utf8               " Set global encoding to UTF8
+set termencoding=utf-8          " Set specific term enncoding to UTF8
 
-" new splits default to right, or below
-set splitbelow
-set splitright
+" I'd have to spent some time on this -- doesn't feel like working now.
+" set autoread
+" let autoreadargs={'autoread':1} 
+" execute WatchForChanges("*",autoreadargs) 
 
-" tabs for makefiles
-autocmd FileType make setlocal noexpandtab
+set wildmenu                    " Enable <:e> "correctly".
+set wildmode=list:longest,full  " How we will showcase it and what to prioritize.
+set wildignore=*.o,*~,*.pyc     " Ignore the following files.
 
-" highlighting
-autocmd BufNewFile,BufRead *.json set ft=javascript
-autocmd BufNewFile,BufRead *.md set ft=markdown spell
+set title                       " Enable costum title modification.
+set titlestring=%t:%l%r%m       " %f(Current file) %l(Current line) %r%m(Flags)
+set titlelen=24                 " The max length the title can have.
 
-let g:clipbrdDefaultReg = '+'
-colorscheme 2033
-set cursorline
-set nowrap
-set title
-let &titleold=getcwd()
+set undofile                    " Save undo's after file closes
+set undodir=~/.vim/undo,/tmp    " Where to save undo histories
+set undolevels=1024             " How many undos.
+set undoreload=1024             " Number of lines to save for undo.
 
-" enable pathogen
+set nowrap                      " Prevent vim from wrapping code in the current view.
+set sidescroll=5                " The minimal amount of columns to scroll.                                 
+set listchars+=extends:>        " What character to use for outwrapped text.
+
+set tw=80           " Ensure a recommended-width for vim.
+set number          " Show line numbers.
+set softtabstop=4   " While in fact a mix of spaces and <Tab>s is used.
+set shiftwidth=4    " Number of spaces to use for each step of (auto)indent.
+set tabstop=4       " <Tab>width to 4 spaces.
+set smartindent     " Works nearly the same as smarttab.
+set smarttab        " Keep the logical indenting when already indented.
+set autoindent      " Copy indent from current line when starting a new line.
+set hidden          " It hides buffers instead of closing them. 
+set expandtab       " Expand to a set tabwidth to ease indenting.
+set ttyfast         " Indicates a fast terminal connection.  
+                    " More characters will be sent to the screen for redrawing
+set lazyredraw      " Waits patiently until the screen has finished drawing.
+set showcmd         " Displays additional line and block data.
+set iskeyword+=-    " Eases on <:cw>
+set colorcolumn=80  " Visualise a row at said columns.
+set splitright      " When a new split is made with <:split> it is made below.
+set splitbelow      " When a new split is amde with <:vsplit> is is made right. 
+set noswapfile      " Don't make swap files -- they're a waste of time.
+set ignorecase      " Ignore case sensetive searches. (FOO == foo).
+set magic           " Allow ReExpr characters and use them to vaul.
+
+" Return to last edit position when opening files.
+autocmd BufReadPost *
+    \ if line("'\"") > 0 && line("'\"") <= line("$") |
+    \   exe "normal! g`\"" |
+    \ endif
+
+" This function will ease searching quite a bit.
+" When hovering a word pressing <CR> (Usually enter) will highlight all
+" Identical words throughout the file. 
+let g:hl = 0
+function! Highlighting()
+    if g:hl == 1 && @/ =~ '^\\<'.expand('<cword>').'\\>$'
+        let g:hl = 0
+        return ":silent nohlsearch\<CR>"
+    endif
+        let @/ = '\<'.expand('<cword>').'\>'
+        let g:hl = 1
+        return ":silent set hlsearch\<CR>"
+endfunction
+nnoremap <silent> <expr> <CR> Highlighting()
+
+" Here we load pathogen, makes plugins so much easier.
 call pathogen#infect()
 
-" handle swp files
-set directory=~/.vim/swap,~/tmp,.
-set noswapfile
+" Ensure syntax highlighting is on.
+syntax on           
+" Set the current colorscheme.
+colors new          
 
-"backup
-"set backup
-"set backupdir=~/.vim/backup
-"set directory=~/.vim/tmp
+" Both these filetypes do not have a default setting and need to be set by hand.
+" Oddly enough .md stands for Modulus 4 and .JSON just never bothered.
+autocmd BufNewFile,BufRead *.json set ft=javascript
+autocmd BufNewFile,BufRead *.md set ft=markdown
 
-" enable clipboard
-set clipboard=unnamedplus,unnamed
-" set clipboard+=unnamed
+" Switch these around for faster user -- personal preference.
+nnoremap : ;
+nnoremap ; :
 
-" Automatically source vimrc on save.
-augroup reload_vimrc " {
-    autocmd!
-    autocmd BufWritePost $MYVIMRC source $MYVIMRC
-augroup END " }
-
-" Enable utf8
-set encoding=utf8
-set termencoding=utf-8
-
-" searching
-set incsearch
-set nohlsearch
-set smartcase
-set ignorecase
-
-" persistent undo history
-set undofile " Save undo's after file closes
-set undodir=~/.vim/undo,/tmp " where to save undo histories
-set undolevels=1000 " How many undos
-set undoreload=1000 " number of lines to save for undo
-
-" return to last edit position when opening file
-autocmd BufReadPost *
-            \ if line("'\"") > 0 && line("'\"") <= line("$") |
-            \   exe "normal! g`\"" |
-            \ endif"`'")"'")
-
-" function for getting man file for current word
-fun! ReadMan()
-    " Assign current word under cursor to a script variable:
-    let s:man_word = expand('<cword>')
-    :exe ":wincmd n"
-    :exe ":r!man " . s:man_word . " | col -b"
-    :exe ":goto"
-    :exe ":delete"
-    :exe ":set filetype=man"
-endfun
-
-" function for switching between number mode
-function! ToggleNumberMode()
-    if &relativenumber == 1
-        set norelativenumber
-        set number
-        echo "normal numbering"
-        " elseif &number == 1
-        " set nonumber
-        " echo "numbering off"
-    else
-        set relativenumber
-        echo "relative numbering"
-    endif
-    return
-endfunc
-
-" maps
-map 0 ^
-nnoremap T :tabnew<cr>
-nnoremap <C-o> :NERDTreeToggle<cr>
-map Y y$
+" Tab and buffer manangement.
 nnoremap Z :bprev<cr>
 nnoremap X :bnext<cr>
 nnoremap <M-Z> :tabprev<cr>
 nnoremap <M-X> :tabnext<cr>
-imap <C-BS> <C-W>
-nmap <C-k> ddkP
-nmap <C-j> ddp
-" toggle spell check
-map <leader>ss :setlocal spell!<cr>
-" disable Ex mode
-map Q <Nop>
-" reselect after indenting selection
-vnoremap < <gv
-vnoremap > >gv
-" commenting
-map <C-c> <Leader>cm<cr>
-map <C-x> <Leader>cu<cr>
-map <C-a> <Leader>cs<cr>
-" number sign fix
-inoremap # X<c-h>#
-" search will center on the line it's found in.
-map N Nzz
-map n nzz
-" swap : with ;
-nnoremap ; :
-nnoremap : ;
-" write to read only file
-cnoremap w!! w !sudo tee % >/dev/null
-" reformat file
-nnoremap <Leader>f mzgg=G`z`
-" man for current word
-nnoremap K :call ReadMan()<CR>
-" toggle number mode
-nnoremap <f6> :call ToggleNumberMode()<cr>
-vnoremap <f6> :call ToggleNumberMode()<cr>
-inoremap <f6> <c-o>:call ToggleNumberMode()<cr>
-" system clipboard pasting
+
+" Pasting and yanking from the system clipboard.
 nnoremap <Leader>y :w !xclip<cr><cr>
 nnoremap <Leader>yy :w !xclip<cr><cr>
 nnoremap <Leader>p :r !xclip -o<cr>
-" deleting without saving to default register
-nnoremap <Leader>d "_d
-nnoremap <Leader>D "_D
-nnoremap <Leader>C "_C
-nnoremap <Leader>c "_c
-nnoremap <Leader>x "_x
-" resizing
-noremap <up>    <C-W>+
-noremap <down>  <C-W>-
-noremap <left>  3<C-W><
-noremap <right> 3<C-W>>
-" move visual block
-vnoremap J :m '>+1<CR>gv=gv
-vnoremap K :m '<-2<CR>gv=gv
-" switching between tab modes
-nmap <Leader>t :set expandtab tabstop=4 shiftwidth=4 softtabstop=4<CR>
-nmap <Leader>T :set expandtab tabstop=8 shiftwidth=8 softtabstop=4<CR>
-
-" remove ^M
-nnoremap <Leader>m :%s/<cr>//g
-
-" Snippet variables.
-let g:snips_author_short= 'Mvdw'
-let g:snips_author_long = 'Mirko van der Waal'
-let g:snips_email = '<Mirkovdw@outlook.com>'
-let g:snips_github= 'https://github.com/Imakethings/'
-
-" Create one space after a commit sign.
-let NERDSpaceDelims=1
-
-" matchtag custom color
-let g:mta_use_matchparen_group = 0
-let g:mta_set_default_matchtag_color = 0
-
-" errors
-let g:syntastic_aggregate_errors = 1
-
-" disable php folding
-let g:DisableAutoPHPFolding = 1
-
-" powerline
-set laststatus=2
-let g:airline_left_sep='|'
-let g:airline_right_sep='|'
-let g:airline_theme='raven'
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#fnamemod = ':t'
-
-set scrolloff=5
-set sidescroll=5
-
