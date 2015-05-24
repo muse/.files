@@ -4,6 +4,10 @@
 " It were about time because the other ones were so filled with crap.
 " If any of the following things are unclear, most can be solved with <:help arg>
 
+" User defined variables used for various plugins (vim-templates, vim-snippets).
+let g:email = "mvdw at airmail dot cc"
+let g:username = "Mirko van der Waal"
+
 set encoding=utf8               " Set global encoding to UTF8
 set termencoding=utf-8          " Set specific term enncoding to UTF8
 
@@ -78,7 +82,7 @@ call pathogen#infect()
 " Ensure syntax highlighting is on.
 syntax on           
 " Set the current colorscheme.
-colors new          
+colors sigal 
 
 " Both these filetypes do not have a default setting and need to be set by hand.
 " Oddly enough .md stands for Modulus 4 and .JSON just never bothered.
@@ -99,3 +103,14 @@ nnoremap <M-X> :tabnext<cr>
 nnoremap <Leader>y :w !xclip<cr><cr>
 nnoremap <Leader>yy :w !xclip<cr><cr>
 nnoremap <Leader>p :r !xclip -o<cr>
+
+" BufTabLine variables, lets and sets
+let g:buftabline_indicators=1
+
+" Syntastic variables, sets and lets.
+" set statusline+=%#warningmsg#
+" set statusline+=%{SyntasticStatuslineFlag()}
+" set statusline+=%*
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+

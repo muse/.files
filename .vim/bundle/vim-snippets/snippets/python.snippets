@@ -21,7 +21,7 @@ snippet die
 # (D)ocstring (mod)ule
 snippet dmod
 	"""	
-	Author: `g:snips_author_short`
+	Author: `g:username`
 	Main:   ${1:Name}		
 	Module: `vim_snippets#Directory('$1')`/`vim_snippets#Filename('$1')`
 	Description: 
@@ -31,11 +31,10 @@ snippet dmod
 # (D)ocstring (main)
 snippet dmain
 	"""
-	Author:	`g:snips_author_long`
+	Author: `g:username`
 	License:${1:MIT}
-	Email:	`g:snips_email`
-	Github: `g:snips_github`
-	File:	`vim_snippets#Filename('$1.py')`
+	Email: <`g:email`>
+	File: `vim_snippets#Filename('$1.py')`
 	Description:
 		${0}
 	"""

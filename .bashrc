@@ -23,6 +23,7 @@ alias xmerge="xrdb -merge ~/.Xresources"
 alias ls="ls -aG --color=auto"
 
 alias ix="curl -F 'f:1=<-' ix.io"
+alias xip="curl icanhazip.com"
 
 # Kill current shell (Leaves no trace of commands.)
 alias kcs="kill -9 $$"		

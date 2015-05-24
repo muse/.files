@@ -1,0 +1,48 @@
+#!/bin/bash
+# Reload the files for backup, this is used to prevent symlinking everything.
+
+OVERWRITE=false
+VERBOSE=false
+CONFIG=$HOME/.config/.files
+FILES=(.vimrc 
+       .bashrc     .bash_profile .xinitrc
+       .Xresources .Xdefaults   
+       
+       .vim/git-pull-bundle 
+       .vim/bundle/vim-snippets/snippets/javascript.snippets
+       .vim/bundle/vim-snippets/snippets/python.snippets
+       .vim/bundle/vim-snippets/snippets/_.snippets
+       
+       .weechat/perl/autoload/buffers.pl
+       .weechat/weechat.conf
+       ) # Assume HOME directory as default, specific '/' otherwise.
+
+while getopts hovc: flag; do
+    case $flag in 
+        o|verbose) OVERWRITE=true   ;;
+        v) VERBOSE=true     ;;
+        c) CONFIG=$OPTARG   ;;
+        h) echo "
+            -o, Allow overwriting of existing files in the config directory.
+            -v, Display every move being done or attempted.
+            -c, Specify a new configuration directory (omit the exisiting one).
+            -h, Do this.
+        "
+    esac
+done
+
+for f in "${FILES[@]}"; do
+    if [[ -f $HOME/$f ]]; then :
+        if [[ -f $CONFIG/$f ]]; then :
+             [[ $VERBOSE = true && $OVERWRITE = false ]] && echo "There's already an copy of this file detected. ($CONFIG/$f)"
+             if [[ $OVERWRITE = true ]]; then :
+                [[ $VERBOSE = true ]] && echo "Wrote $CONFIG/$f."
+                cp $HOME/$f $CONFIG/$f
+             fi
+        else
+            [[ $VERBOSE = true ]] && echo "Wrote $CONFIG/$f."
+            cp $HOME/$f $CONFIG/$f
+        fi 
+    fi
+done
+

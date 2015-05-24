@@ -1,0 +1,18 @@
+#!/usr/bin/bash
+# Any snippet costumized will be added here and can be coppied to the .files
+# By running this script. It doesn't collide with //vim-snippets or //ultisnips.
+PATH_TO_VIMSNIPPETS=/home/mvdw/.vim/bundle/vim-snippets
+PATH_TO_DOTFILES=/home/mvdw/.config/.files/.vim/bundle/vim-snippets/snippets
+SNIPPETS=(javascript python _)
+for i in "${SNIPPETS[@]}";do :
+    if [[ $(stat -c%s $PATH_TO_DOTFILES/$i.snippets) -eq $(stat -c%s $PATH_TO_VIMSNIPPETS/snippets/$i.snippets) ]]; then
+        echo "Nothing changed, no need to copy. ($i.snippets)"
+    else
+        cp $PATH_TO_VIMSNIPPETS/snippets/$i.snippets $PATH_TO_DOTFILES
+        echo "Succesfully coppied $i.snippets " 
+    fi
+done
+
+cp $PATH_TO_VIMSNIPPETS/autoload/vim_snippets.vim $PATH_TO_DOTFILES
+echo "Succesfully rewrote /autoload."
+

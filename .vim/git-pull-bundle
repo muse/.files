@@ -1,0 +1,16 @@
+#!/bin/bash
+
+BUNDLE=/home/mvdw/.vim/bundle
+
+if [[ -d $BUNDLE ]]; then
+    for VAL in $BUNDLE/*; do
+        if [[ -d $VAL/.git ]]; then
+            cd $VAL
+            if [[ -d .git ]]; then
+                git pull
+                echo "Succesfully pulled $VAL"
+            fi
+            cd ..
+        fi
+    done
+fi 
