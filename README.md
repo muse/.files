@@ -1,5 +1,5 @@
 Colorscheme, simply load my `.Xresources` (`.Xdefaults`) and merge.
-![Screenshot](http://a.pomf.se/ugackq.png)
+![Screenshot](http://a.pomf.se/bjxvkz.png)
 Inside vim. You would need the entire `.vim/` directory for this.
 ![Screenshot](http://a.pomf.se/grvvwn.png)
 
