@@ -12,7 +12,8 @@ FILES=(.vimrc
        .vim/bundle/vim-snippets/snippets/javascript.snippets
        .vim/bundle/vim-snippets/snippets/python.snippets
        .vim/bundle/vim-snippets/snippets/_.snippets
-       
+       .vim/colors/sigal.vim
+
        .weechat/perl/autoload/buffers.pl
        .weechat/weechat.conf
        ) # Assume HOME directory as default, specific '/' otherwise.
