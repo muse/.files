@@ -16,11 +16,13 @@ FILES=(.vimrc
 
        .weechat/perl/autoload/buffers.pl
        .weechat/weechat.conf
+
+       /srv/http/index.html
        ) # Assume HOME directory as default, specific '/' otherwise.
 
 while getopts hovc: flag; do
     case $flag in 
-        o|verbose) OVERWRITE=true   ;;
+        o) OVERWRITE=true   ;;
         v) VERBOSE=true     ;;
         c) CONFIG=$OPTARG   ;;
         h) echo "
@@ -32,8 +34,10 @@ while getopts hovc: flag; do
     esac
 done
 
+# echo /srv/http/index.html|sed -e 's/\//;/g'|awk -F';' '{print $(NF)}'
+
 for f in "${FILES[@]}"; do
-    if [[ -f $HOME/$f ]]; then :
+    if [[ -f $HOME/$f || -f $f ]]; then :
         if [[ -f $CONFIG/$f ]]; then :
              [[ $VERBOSE = true && $OVERWRITE = false ]] && echo "There's already an copy of this file detected. ($CONFIG/$f)"
              if [[ $OVERWRITE = true ]]; then :
@@ -41,8 +45,15 @@ for f in "${FILES[@]}"; do
                 cp $HOME/$f $CONFIG/$f
              fi
         else
-            [[ $VERBOSE = true ]] && echo "Wrote $CONFIG/$f."
-            cp $HOME/$f $CONFIG/$f
+            if [[ -f $HOME/$f ]]; then :
+                cp $HOME/$f $CONFIG/$f
+                [[ $VERBOSE = true ]] && echo "Wrote $CONFIG/$f."
+            elif [[ -f $f ]]; then :
+                cp $f $CONFIG/$f
+                [[ $VERBOSE = true ]] && echo "Wrote $CONFIG/$f."
+            else
+                echo "Missing or wrong file detected ($f)"
+            fi
         fi 
     fi
 done

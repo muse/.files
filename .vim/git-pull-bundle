@@ -7,8 +7,8 @@ if [[ -d $BUNDLE ]]; then
         if [[ -d $VAL/.git ]]; then
             cd $VAL
             if [[ -d .git ]]; then
-                git pull
-                echo "Succesfully pulled $VAL"
+                echo -e "$VAL - $(git pull)" 
+
             fi
             cd ..
         fi
