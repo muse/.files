@@ -1,0 +1,109 @@
+#!/bin/bash
+# Maintainer: Mirko van der Waal
+# Contact: <mvdw at airmail dot cc>
+# Packages: libnotify xclip
+#
+# Find out that some things aren't working? Follow these stepts to ensure
+# I am not at fault.
+# 1. Have a internet connection, I know it may sound silly but some people
+#    just don't have it or forget that they aren't currently connected.
+# 2. Export the $BROWSER variable when using the -w flag. This relies on you
+#    exporting that variable to know what browser to force the file in.
+# 3. The specified file or paste is not bigger than 50MB or rarely 5MB.
+# 4. Make sure the LOCALSAVE and LOGSAVE variable paths are existant.
+#    If this is not the case moving the file could cause problems to the script.
+# 5. Don't forget to install the required packages, the names may vary
+#    for the different operating systems.
+
+VERSION="Pomfsh 0.1"                    # Publish the version.
+
+APOMFURL="http://pomf.se/upload.php"    # Throw the file here for a normal upload.
+LOCALSAVE=$HOME/Pictures/pomfs          # Save a local copy of the file here.
+LOGSAVE=$HOME/Pictures/pomfs/url.list   # Write the url to this file to keep track.
+
+FULLSCREEN=false    # Take a fullscreen screenshot.
+SELECTION=false     # Allow to create a selection for the screenshot
+UPLOADFILE=false    # Upload a file, this is not a pastelike feature this this-
+                    # will be unreadable and saved as a binary when not-
+                    # provided with an .extension
+FORCETOWWW=false    # Instantly open the submitted file in the browser.
+
+HELP="""
+\n $(tput bold)-u$(tput sgr0)\n 
+Nearly all file types will turn downloadable as a binary except for:\n
+$(tput bold).txt .png .jpg$(tput sgr0)\n
+
+\n $(tput bold)-f$(tput sgr0)\n 
+Create an fullscreen screenshot, this doesn't work together with \`-s\`.\n
+
+\n $(tput bold)-s$(tput sgr0)\n 
+Create a selection screenshot allowing you to only capture a part of the
+screen.\n
+
+\n $(tput bold)-w$(tput sgr0)\n 
+Force the screenshot to open in the \$BROWSER. This only works when said
+variable is exported.\n
+
+\n $(tput bold)-g$(tput sgr0)\n 
+Write the \$URL to the \$LOGSAVE file to keep track of made screenshots.\n
+
+\n $(tput bold)-l$(tput sgr0)\n 
+Save a local copy of the screenshot to the \$LOCALSAVE path.\n
+
+\n $(tput bold)EXAMPLES$(tput sgr0)\n
+\t% pomf -swgl\n
+\t% pomf -fw\n
+"""
+
+while getopts fhswvglu: flag; do
+    case $flag in
+        u) UPLOADFILE=true      
+           FILEARG=$OPTARG        ;;
+        f) FULLSCREEN=true        ;;
+        w) FORCETOWWW=true        ;;
+        s) SELECTION=true         ;;
+        g) BOOL_LOGSAVE=true      ;;
+        l) BOOL_LOCALSAVE=true    ;;
+        v) echo -e $VERSION; exit ;;
+        h) echo -e $HELP; exit    ;;
+       --) echo -e $HELP; exit    ;;
+        ?) echo -e $HELP; exit    ;;
+        *) echo -e $HELP; exit    ;;
+    esac
+done
+
+# Get the current file.
+if [[ $FULLSCREEN = true ]]; then :
+    FILE=$(FILENAME=$(tr -dc "[:alpha:]"</dev/urandom|head -c 6).png;scrot $FILENAME;echo -n $FILENAME)
+elif [[ $SELECTION = true ]]; then :
+    FILE=$(FILENAME=$(tr -dc "[:alpha:]"</dev/urandom|head -c 6).png;scrot -s $FILENAME;echo -n $FILENAME)
+elif [[ $UPLOADFILE = true ]]; then :
+    FILE=$FILEARG
+else
+    echo "You either forgot a to specify a file or a -flag. "
+    exit
+fi
+
+# Upload the file
+if [[ $UPLOADFILE = true || $FULLSCREEN = true || $SELECTION = true ]]; then :
+    OUTPUT=$(curl --silent -sf -F files[]="@$FILE" $APOMFURL)
+    if [[ ${OUTPUT} =~ '"success":true' ]]; then :
+        URL=$(echo "$OUTPUT" | grep -Eo '"url":"[A-Za-z0-9]+.*",' | \
+                               sed 's/"url":"//;s/",//')
+    
+        notify-send http://a.pomf.se/$URL
+         
+        [[ $BOOL_LOCALSAVE = true ]] && mv $FILE $LOCALSAVE/$URL || rm $FILE
+        [[ $BOOL_LOGSAVE = true ]] && echo http://pomf.se/$URL >> $LOGSAVE
+        [[ $FORCETOWWW = true ]] && $BROWSER http://a.pomf.se/$URL
+        
+        echo -n $URL | xclip -selection primary     &>/dev/null
+        echo -n $URL | xclip -selection clipboard   &>/dev/null
+
+        echo "Succesfully uploaded: http://a.pomf.se/$URL"
+
+    else
+        echo "You failed to upload the file ($FILE)"
+        exit
+    fi
+fi
