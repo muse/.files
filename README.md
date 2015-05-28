@@ -1,8 +1,12 @@
-Colorscheme, simply load my `.Xresources` (`.Xdefaults`) and merge.
-![Screenshot](http://a.pomf.se/bjxvkz.png)
-Inside vim. You would need the entire `.vim/` directory for this.
-![Screenshot](http://a.pomf.se/grvvwn.png)
+Required: `.Xresources`
+![Screenshot](http://a.pomf.se/hrpzai.png)
+
+Required: `.vim/`, `.Xresources`.
+![Screenshot](http://a.pomf.se/ylotph.png)
+
+Required: `index.html`, `.sigal.css`.
+![Screenshot](http://a.pomf.se/wrhtqc.png)
 
 > Real Men don't make backups. They upload it via ftp and let the world mirror it.
-> -- Linus Torvalds
+> * -- Linus Torvalds
 
