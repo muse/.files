@@ -12,6 +12,7 @@ FILES=(.vimrc
        .vim/bundle/vim-snippets/snippets/javascript.snippets
        .vim/bundle/vim-snippets/snippets/python.snippets
        .vim/bundle/vim-snippets/snippets/_.snippets
+       .vim/bundle/vim-template/templates/\=template\=.csst
        .vim/colors/sigal.vim
 
        .weechat/perl/autoload/buffers.pl
