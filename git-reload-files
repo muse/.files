@@ -40,8 +40,15 @@ for f in "${FILES[@]}"; do
         if [[ -f $CONFIG/$f ]]; then :
              [[ $VERBOSE = true && $OVERWRITE = false ]] && echo "There's already an copy of this file detected. ($CONFIG/$f)"
              if [[ $OVERWRITE = true ]]; then :
-                [[ $VERBOSE = true ]] && echo "Wrote $CONFIG/$f."
-                cp $HOME/$f $CONFIG/$f
+                if [[ -f $HOME/$f ]]; then :
+                    cp $HOME/$f $CONFIG/$f
+                    [[ $VERBOSE = true ]] && echo "Wrote $CONFIG/$f."
+                elif [[ -f $f ]]; then :
+                    cp $f $CONFIG/$f
+                    [[ $VERBOSE = true ]] && echo "Wrote $CONFIG/$f."
+                else
+                    echo "Missing or wrong file detected ($f)"
+                fi
              fi
         else
             if [[ -f $HOME/$f ]]; then :

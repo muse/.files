@@ -7,6 +7,7 @@
 " User defined variables used for various plugins (vim-templates, vim-snippets).
 let g:email = "mvdw at airmail dot cc"
 let g:username = "Mirko van der Waal"
+let g:license = "GNU2"
 
 set encoding=utf8               " Set global encoding to UTF8
 set termencoding=utf-8          " Set specific term enncoding to UTF8
