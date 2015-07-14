@@ -12,11 +12,6 @@ let g:license = "GNU2"
 set encoding=utf8               " Set global encoding to UTF8
 set termencoding=utf-8          " Set specific term enncoding to UTF8
 
-" I'd have to spent some time on this -- doesn't feel like working now.
-" set autoread
-" let autoreadargs={'autoread':1} 
-" execute WatchForChanges("*",autoreadargs) 
-
 set wildmenu                    " Enable <:e> "correctly".
 set wildmode=list:longest,full  " How we will showcase it and what to prioritize.
 set wildignore=*.o,*~,*.pyc     " Ignore the following files.
@@ -56,26 +51,26 @@ set noswapfile      " Don't make swap files -- they're a waste of time.
 set ignorecase      " Ignore case sensetive searches. (FOO == foo).
 set magic           " Allow ReExpr characters and use them to vaul.
 
+" switching between number mode
+function ToggleNumber()
+    if &relativenumber == 1
+        set norelativenumber
+        set number
+        " echo "Normal"
+    else
+        set relativenumber
+        " echo "Relative"
+    endif
+   return
+endfunc
+
+nnoremap <C-n> :call ToggleNumber() <CR>
+
 " Return to last edit position when opening files.
 autocmd BufReadPost *
     \ if line("'\"") > 0 && line("'\"") <= line("$") |
     \   exe "normal! g`\"" |
     \ endif
-
-" This function will ease searching quite a bit.
-" When hovering a word pressing <CR> (Usually enter) will highlight all
-" Identical words throughout the file. 
-let g:hl = 0
-function! Highlighting()
-    if g:hl == 1 && @/ =~ '^\\<'.expand('<cword>').'\\>$'
-        let g:hl = 0
-        return ":silent nohlsearch\<CR>"
-    endif
-        let @/ = '\<'.expand('<cword>').'\>'
-        let g:hl = 1
-        return ":silent set hlsearch\<CR>"
-endfunction
-nnoremap <silent> <expr> <CR> Highlighting()
 
 " Here we load pathogen, makes plugins so much easier.
 call pathogen#infect()
@@ -83,12 +78,12 @@ call pathogen#infect()
 " Ensure syntax highlighting is on.
 syntax on           
 " Set the current colorscheme.
-colors sigal 
+colors sigal256
 
-" Both these filetypes do not have a default setting and need to be set by hand.
-" Oddly enough .md stands for Modulus 4 and .JSON just never bothered.
+" Unknown filetypes to vim, some make sense -- others don't.
 autocmd BufNewFile,BufRead *.json set ft=javascript
 autocmd BufNewFile,BufRead *.md set ft=markdown
+autocmd BufNewFile,BufRead *.csst set ft=css
 
 " Switch these around for faster user -- personal preference.
 nnoremap : ;
@@ -101,17 +96,31 @@ nnoremap <M-Z> :tabprev<cr>
 nnoremap <M-X> :tabnext<cr>
 
 " Pasting and yanking from the system clipboard.
-nnoremap <Leader>y :w !xclip<cr><cr>
-nnoremap <Leader>yy :w !xclip<cr><cr>
-nnoremap <Leader>p :r !xclip -o<cr>
+nnoremap <Leader>yy :w !xclip <CR><CR>
+nnoremap <Leader>y :w !xclip <CR><CR>
+nnoremap <Leader>p :r !xclip -o <CR>
 
 " BufTabLine variables, lets and sets
 let g:buftabline_indicators=1
 
+" UltiSnips variables, lets and sets
+let g:UltiSnipsExpandTrigger="<TAB>"
+let g:UltiSnipsJumpForwardTrigger="<TAB>"
+let g:UltiSnipsJumpBackwardTrigger="<S-TAB>"
+
+" Python-mode variables, lets and sets
+let g:pymode = 1
+let g:pymode_syntax_all = 1
+let g:pymode_warnings = 0
+let g:pymode_indent = 1
+let g:pymode_doc = 1
+let g:pymode_lint = 0
+let g:pymode_rope = 0
+let g:pymode_trim_whitespaces = 1
+let g:pymode_options_max_line_length = 79
+let g:pymode_folding = 0
+let g:pymode_lint = 0
+
 " Syntastic variables, sets and lets.
-" set statusline+=%#warningmsg#
-" set statusline+=%{SyntasticStatuslineFlag()}
-" set statusline+=%*
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
-

@@ -3,48 +3,62 @@
 !! Are actual comments.
 !  Are alternatively commented options.
 
+URxvt.internalBorder: 10
+URxvt.geometry: 64x32
+
+URxvt.font:xft:LiberationMono-Regular:size=8
+URxvt.boldFont:xft:LiberationMono-Bold:size=8:style=bold
+URxvt.italicFont:xft:LiberationMono-Italic:size=8:style=italic
+!URxvt.font:xft:terminus:size=9
+!URxvt.boldFont:xft:terminus:size=9:style=bold
+!URxvt.italicFont:xft:terminus:size=9:style=italic
+
+
+
 !! Pretty nice and wide, Good for clearer reading. 
-!! NOTE: Yet to build this one!
 !URxvt.font: xft:ProggyCleanTT:size=12
+
 !! My default font.
-URxvt.boldFont:xft:GohuFont:size=9
-URxvt.font:xft:GohuFont:size=9
+!! URxvt.font: xft:GohuFont:size=9
 
-URxvt.background: #1C1C1C
-URxvt.foreground: 15
-	
-!BLACK
-URxvt.color0:   #14101C
-URxvt.color8:   #4B464F
-!RED
-URxvt.color1:   #AD6A72
-URxvt.color9:   #D99395
-!GREEN
-URxvt.color2:   #A2B07F
-URxvt.color10:  #C4D1A1
-!YELLOW
-URxvt.color3:   #B39976
-URxvt.color11:  #D1C894
-!BLUE
-URxvt.color4:   #829BA8
-URxvt.color12:  #9BB6D4
-!MAGENTA
-URxvt.color5:   #AD748E
-URxvt.color13:  #DB9CBE
-!CYAN
-URxvt.color6:   #7D9B90
-URxvt.color14:  #A4C1B7
-!WHITE
-URxvt.color7:   #AAA5AD
-URxvt.color15:  #D6CCDC
+!! Back and foreground color defaults.
+URxvt.background: #121212
+URxvt.foreground: #BBEECC
 
-Xft.hintstyle:hintslight                                                        
-Xft.lcdfilter:lcddefault                                                        
-URxvt.letterSpace:1.2
+
+!! black
+URxvt.color0 : #353540
+URxvt.color8 : #545466
+!! red
+URxvt.color1 : #8c5760
+URxvt.color9 : #b26f7a
+!! green
+URxvt.color2 : #7b8c58
+URxvt.color10 : #9db270
+!!yellow
+URxvt.color3 : #8c6e43
+URxvt.color11 : #b28c55
+!!blue
+URxvt.color4 : #58698c
+URxvt.color12 : #7086b2
+!!magenta
+URxvt.color5 : #7b5e7d
+URxvt.color13 : #9c77b2
+!!URxvt.cyan
+URxvt.color6 : #66808c
+URxvt.color14 : #82a2b2
+!!white
+URxvt.color7 : #8c8b8b
+Uxvt.color15 : #b8b8c8
+
+
+Xft.dpi:96                                                                      
+URxvt.letterSpace:0
 Xft.antialias:1                                                                 
 Xft.hinting:1                                                                   
+Xft.hintstyle:hintslight                                                        
 Xft.rgba:rgb                                                                    
-Xft.dpi:96                                                                      
+Xft.lcdfilter:lcddefault                                                        
 
 !! Enabling clickable links:
 URxvt.perl-ext-common: default,matcher
