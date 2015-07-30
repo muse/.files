@@ -4,8 +4,8 @@
 # Contact: <mvdw at airmail dot cc>
 #
 # An very easy 1339.cf uploader for the command line. It was originally
-# created for pomf which has been taken down by the owner. 
-# (Goodnight sweet prince) 
+# created for pomf which has been taken down by the owner.
+# (Goodnight sweet prince)
 
 VERSION=0.2
 NAME=cf
@@ -39,45 +39,45 @@ LOG=$HOME/Pictures/1339s/url.list
 
 while true; do
     case "$1" in
-        -f|--fullscreen) 
+        -f|--fullscreen)
             FULLSCREEN=true
-            shift   ;;     
-        
-        -s|--selection) 
-            SELECTION=true 
             shift   ;;
 
-        -u|--upload) 
+        -s|--selection)
+            SELECTION=true
+            shift   ;;
+
+        -u|--upload)
             UPLOAD_ARGUMENT=$2
-            UPLOAD=true 
-            shift 2 ;;     
+            UPLOAD=true
+            shift 2 ;;
 
         -l|--logfile)
             LOGFILE=true
             shift   ;;
 
-        -o|--offline) 
+        -o|--offline)
             OFFLINE=true
             shift   ;;
 
-        -b|--browser) 
+        -b|--browser)
             WWW=true
             shift   ;;
 
-        -v|--version) 
+        -v|--version)
             echo $NAME - $VERSION;
             exit 0  ;;
-        
-        -h|--help) 
+
+        -h|--help)
             echo "
 $(tput bold)NAME$(tput sgr0)
-    cf - an 1339.cf uploading tool. 
+    cf - an 1339.cf uploading tool.
 
 $(tput bold)FLAGS$(tput sgr0)
     $(tput bold)-u, --upload$(tput sgr0)
         Upload the <argument> file. This throws away the \`-s\` & \`-f\` flags.
         You can however save the file locally and write it to the logfile.
-        
+
     $(tput bold)-f, --fullscreen$(tput sgr0)
         Create a fullscreen screenshot, this takes a screenshot of all the-
         available and active monitors. If you want to take a screenshot of only-
@@ -105,7 +105,7 @@ $(tput bold)FLAGS$(tput sgr0)
 
 $(tput bold)ISSUES$(tput sgr0)
     The following points are also addressed in the source of the code.
-    
+
     *  Have a internet connection, I know it may sound silly but some people
        just don't have it or forget that they aren't currently connected.
 
@@ -124,11 +124,11 @@ $(tput bold)EXAMPLES$(tput sgr0)
     % cf -bslo
         A complete package allowing selection and saving the files to both-
         the logs and locally.
-    % cf -sl 
+    % cf -sl
         A selective screenshot which is saved to the logfile.
-    % cf -f 
+    % cf -f
         Merely a fullscreen screenshot
-        "; 
+        ";
         exit 0  ;;
 
         -- ) shift; break ;;
@@ -137,11 +137,11 @@ $(tput bold)EXAMPLES$(tput sgr0)
 done
 
 # Get the current file.
-if   [[ $FULLSCREEN ]]; then 
-    FILE=$(NAME=$(echo -n $$.png); scrot $NAME; echo -n $NAME)
-elif [[ $SELECTION ]]; then 
-    FILE=$(NAME=$(echo -n $$.png); scrot -s $NAME; echo -n $NAME)
-elif [[ $UPLOAD ]]; then 
+if   [[ $FULLSCREEN ]]; then
+    FILE=$(NAME=$(echo -n $$.png); scrot /tmp/$NAME; echo -n /tmp/$NAME)
+elif [[ $SELECTION ]]; then
+    FILE=$(NAME=$(echo -n $$.png); scrot -s /tmp/$NAME; echo -n /tmp/$NAME)
+elif [[ $UPLOAD ]]; then
     FILE=$UPLOAD_ARGUMENT
 else
     echo "You either forgot a to specify one of the required flags"
@@ -153,16 +153,16 @@ if [[ ${OUTPUT} =~ '"success":true' ]]; then :
     IMAGE=$(echo "$OUTPUT" | grep -Eo '"url":"[A-Za-z0-9]+.*",' | \
                              sed 's/"url":"//;s/",//')
     [[ $OFFLINE ]] && \
-        mv $FILE $IMG/$IMAGE 
+        mv $FILE $IMG/$IMAGE
     [[ $LOGFILE ]] && \
         echo http://a.$URL/$IMAGE >> $LOG
     [[ $WWW ]] && \
         $WWW http://a.$URL/$IMAGE
-    
+
     naughtify --preset normal --title "Succesfully uploaded" http://a.$URL/$IMAGE
 
-    echo -n $DONE | xclip -selection primary     &>/dev/null
-    echo -n $DONE | xclip -selection clipboard   &>/dev/null
+    echo -n http://a.$URL/$IMAGE | xclip -selection primary     &>/dev/null
+    echo -n http://a.$URL/$IMAGE | xclip -selection clipboard   &>/dev/null
     echo "Succesfully uploaded: http://a.$URL/$IMAGE"
 else
     echo "You failed to upload the file ($FILE)"
