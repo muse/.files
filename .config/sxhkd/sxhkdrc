@@ -1,0 +1,195 @@
+# # brightness
+# XF86MonBrightnessUp
+    # xbacklight -inc 10
+
+# XF86MonBrightnessDown
+    # xbacklight -dec 10
+
+#
+# Volume controls.
+# 
+
+alt + m
+    amixer set Master toggle ; pkill not-stat ; not-stat Mt
+
+XF86AudioRaiseVolume
+    amixer set Master 5%+ ; pkill not-stat ; not-stat Vl
+
+alt + Up
+    amixer set Master 2%+ ; pkill not-stat ; not-stat Vl
+
+XF86AudioLowerVolume
+    amixer set Master 5%- ; pkill not-stat ; not-stat Vl
+
+alt + Down
+    amixer set Master 2%- ; pkill not-stat ; not-stat Vl
+
+#
+# Music controls.
+#
+
+super + c
+    urxvt -g 120x34-160+16 -e ncmpcpp
+
+ctrl + alt + Right
+    mpc next || ncmpcpp next || ncmpc next || pms next
+
+ctrl + alt + Left
+    mpc prev || ncmpcpp prev || ncmpc prev || pms prev
+
+ctrl + alt + Down
+    mpc stop || ncmpcpp stop || ncmpc stop || pms stop
+
+ctrl + alt + Up
+    mpc toggle || ncmpcpp toggle || ncmpc toggle || pms toggle
+
+#
+# Bspwm controls.
+#
+
+super + shift + x
+    killall panel && sleep .1 && bspc quit 1
+
+super + x
+    bspc window -c
+
+super + t
+    bspc desktop -l next
+
+super + b
+    bspc desktop -B
+
+super + shift + f
+    bspc desktop -t floating
+
+super + f
+    bspc window -t fullscreen
+
+super + Tab
+    bspc window -f last
+
+super + apostrophe
+    bspc window -s last
+
+super + y
+    bspc window -w last.manual
+
+super + m
+    bspc window -s biggest
+
+super + p
+    bspc window -t pseudo_tiled
+
+super + {_,shift + }c
+    bspc window -f {next,prev}
+
+super + {comma,period}
+    bspc desktop -C {backward,forward}
+
+super + Right 
+    bspc desktop -f next
+
+super + Left
+    bspc desktop -f prev
+
+#preselect area to open new window in dir
+super + ctrl + {Left,Down,Up,Right}
+        bspc window -p {left,down,up,right}
+
+super + ctrl + {h,j,k,l}
+    bspc window -p {left,down,up,right}
+
+super + ctrl + {_,shift + }space
+    bspc {window -p cancel,desktop -c}
+
+super + {h,j,k,l}
+    bspc window -e {left -10,down +10,up -10,right +10}
+
+super + shift {h,j,k,l}
+    bspc window -e {right -10,up +10,down -10,left +10}
+
+alt + shift + {l,h}
+    /home/soud/scripts/bspwm_resize {-p, -n} -x -s 40
+
+alt + shift + {j,k}
+    /home/soud/scripts/bspwm_resize {-p, -n} -y -s 40
+
+super + ctrl + {1-9}
+    bspc window -r 0.{1-9}
+
+super + {_,shift + }{1-9,0}
+    bspc {desktop -f,window -d} ^{1-9,10}
+
+~button1
+    bspc pointer -g focus
+
+super + button{1-3}
+    bspc pointer -g {move,resize_side,resize_corner}
+
+super + !button{1-3}
+    bspc pointer -t %i %i
+
+super + @button{1-3}
+    bspc pointer -u
+
+#
+# Screenshot
+#
+
+Print
+    scrot -z -q 100 ~/shots/%Y-%m-%d-%T-screenshot.png
+
+alt + Print
+    scrot -s -z -q 100 ~/shots/%Y-%m-%d-%T-screenshot.png
+
+
+#
+# Modify size of gaps.
+#/
+
+super + a
+    bspc config -d focused window_gap $((`bspc config -d focused window_gap` + 5))
+
+super + d
+    bspc config -d focused window_gap $((`bspc config -d focused window_gap` - 5))
+
+#
+# Misc.
+#
+
+super + s
+    screencast
+
+super + shift + s
+    pkill -f 'x11grab'
+
+super + l
+    lock
+
+super + e
+    nautilus
+
+super + Return
+    urxvt
+
+super + q
+    firefox
+
+super + r
+    rofi -show run \ 
+         -bw 0 \
+         -bg "#121212" \
+         -bgalt "#212121" \
+         -fg "#666555" \
+         -terminal urxvt \
+         -font 'Liberation Sans 21' \
+         -eh 1.5 \
+         -lines 10 \
+         -width 100 \
+         -height 100 \
+         -padding 600 \
+         -opacity "100"
+
+# Make sxhkd reload the configuration files.
+super + Escape
+    pkill -USR1 -x sxhkd

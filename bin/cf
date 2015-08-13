@@ -157,12 +157,12 @@ if [[ ${OUTPUT} =~ '"success":true' ]]; then :
     [[ $LOGFILE ]] && \
         echo http://a.$URL/$IMAGE >> $LOG
     [[ $WWW ]] && \
-        $WWW http://a.$URL/$IMAGE
+        $BROWSER http://a.$URL/$IMAGE
     
     naughtify --preset normal --title "Succesfully uploaded" http://a.$URL/$IMAGE
 
-    echo -n $DONE | xclip -selection primary     &>/dev/null
-    echo -n $DONE | xclip -selection clipboard   &>/dev/null
+    echo -n $IMAGE | xclip -selection primary     &>/dev/null
+    echo -n $IMAGE | xclip -selection clipboard   &>/dev/null
     echo "Succesfully uploaded: http://a.$URL/$IMAGE"
 else
     echo "You failed to upload the file ($FILE)"

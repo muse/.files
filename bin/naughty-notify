@@ -1,0 +1,183 @@
+#!/bin/bash
+# Copyright (C) 2015 Mirko van der Waal <mvdw at airmail dot cc>
+# Maintainer: Mirko van der Waal
+# Packages: naughty
+# Contact: <mvdw at airmail dot cc>
+# You need to run awesome for this to work.
+
+
+NAME=naughtify
+VERSION=0.1
+
+# Define the short options.
+SHORT="h"
+
+# The reason I defined the long options on the outside is to favor formatting.
+# I can allow newlines to format the long flags to a readable way.
+# I later feed the output to sed and remove then spaces to create the desired result.
+LONG="help,title:,timeout:,hover-timeout:,position:,ontop:,height:,width:,font:,
+      icon:,icon-size:,fg:,bg:,border-width:,border-color:,run:,preset:,
+      replaces-id:,callback:"
+
+FLAGS=`getopt -o $(echo $SHORT) \
+              -l $(echo $LONG | sed 's/ //g') \
+              -n "$0"  \
+              -- "$@"`
+
+# Whenever something goes wrong where we miss or found wrong flags.
+if [ $? != 0 ]; then exit 1 ; fi
+eval set -- "$FLAGS"
+
+# This makes the parameters iterable.
+declare -A PARAMETERS
+
+# Initiate the string.
+STRING="naughty.notify({"
+
+while true; do
+    case "$1" in
+        # All the following flags are part of the assoc array.
+        # They need no further magic done to them.
+        --hover-timeout) PARAMETERS[HOVER_TIMEOUT]="$2"; shift 2;;
+        --border-width) PARAMETERS[BORDER_WIDTH]="$2"; shift 2;;     
+        --border-color) PARAMETERS[BORDER_COLOR]="$2"; shift 2;;     
+        --replaces-id) PARAMETERS[REPLACES_ID]="$2"; shift 2;;     
+        --icon-size) PARAMETERS[ICON_SIZE]="$2"; shift 2;;     
+        --position) PARAMETERS[POSITION]="$2"; shift 2;;     
+        --callback) PARAMETERS[CALLBACK]="$2"; shift 2;;     
+        --timeout) PARAMETERS[TIMEOUT]="$2"; shift 2;;
+        --height) PARAMETERS[HEIGHT]="$2"; shift 2;;     
+        --title ) PARAMETERS[TITLE]="$2"; shift 2;;
+        --ontop) PARAMETERS[ONTOP]="$2"; shift 2;;     
+        --font) PARAMETERS[FONT]="$2"; shift 2;;     
+        --icon) PARAMETERS[ICON]="$2"; shift 2;;     
+        --run) PARAMETERS[RuN]="$2"; shift 2;;     
+        --fg) PARAMETERS[FG]="$2"; shift 2;;     
+        --bg) PARAMETERS[BG]="$2"; shift 2;;     
+
+        # The preset needs some special attention because of certain special
+        # characters and a leading text.
+        --preset) PRESET=$2; shift 2;;     
+
+        # The width orginally doesn't work as expected so therefor needs to be
+        # handeled apart from the rest. It will now have the 'expected' & 
+        # 'suspected' effect. Also serves way more use this way.
+        --width)  WIDTH=$2; shift 2;;
+
+        # Display the content from the wiki mainly.
+        -h|--help) echo "
+$(tput bold)NAME$(tput sgr0)
+    naughty-notify - Easy to use notification wrapper using 'awesome-client'
+
+$(tput bold)SYNOPSIS$(tput sgr0)
+    naughty-notify $(tput bold)[options]$(tput sgr0) $(tput smul)[TEXT...]$(tput sgr0)
+
+$(tput bold)DESCRIPTION$(tput sgr0)
+    Easily call notification through the use of "naughty.notify". This command
+    will be fed to "awesome-client" stdin thus being handeled as lua code.
+
+$(tput bold)FLAGS$(tput sgr0)
+    $(tput bold)--title$(tput sgr0)
+        Title of the notification. 
+
+    $(tput bold)--timeout$(tput sgr0)
+        Time in seconds after which popup expires. Set 0 for no timeout. 
+
+    $(tput bold)--hover-timeout$(tput sgr0)
+        Delay in seconds after which hovered popup disappears. 
+
+    $(tput bold)--screen$(tput sgr0)
+        Target screen for the notification. 
+
+    $(tput bold)--position$(tput sgr0)
+        Corner of the workarea displaying the popups. Values: 
+        'top_right', 'top_left', 'bottom_left', 'bottom_right'.
+
+    $(tput bold)--ontop$(tput sgr0)
+        Boolean forcing popups to display on top. 
+
+    $(tput bold)--height$(tput sgr0)
+        Popup height. This forces a non-scaleable height. 
+
+    $(tput bold)--width$(tput sgr0)
+        Popup width. This sorts the text over the given width.
+
+    $(tput bold)--font$(tput sgr0)
+        Notification font. 
+
+    $(tput bold)--icon$(tput sgr0)
+        Path to icon. 
+
+    $(tput bold)--icon_size$(tput sgr0)
+        Desired icon size in px. 
+
+    $(tput bold)--fg$(tput sgr0)
+        Foreground color. 
+
+    $(tput bold)--bg$(tput sgr0)
+        Background color. 
+
+    $(tput bold)--border-width$(tput sgr0)
+        Border width. 
+
+    $(tput bold)--border-color$(tput sgr0)
+        Border color. 
+
+    $(tput bold)--run$(tput sgr0)
+        Function to run on left click. This function must exist in your rc.lua
+
+    $(tput bold)--preset$(tput sgr0)
+        Table with any of the above parameters. 
+        Any parameters specified directly in args will override ones defined 
+        in the preset.
+
+    $(tput bold)--replaces-id$(tput sgr0)
+        Replace the notification with the given id.
+
+    $(tput bold)--callback$(tput sgr0)
+        Function that will be called with all arguments the notification 
+        will only be displayed if the function returns true 
+        Note: this function is only relevant to notifications sent via dbus
+    "; exit 0 ;;
+        -- ) shift; break ;;
+        *  )        break ;;
+    esac
+done
+
+
+# Get the text from a sum of all the given arguments after the flags.
+for arg; do TEXT="$TEXT $arg"; done
+
+TEXT=$(echo $TEXT | sed 's/^ *//;s/ *$//;s/  */ /;')
+
+# When width is called and it exceeds the length of the current string we'll
+# improve the exisiting width by adding newlines instead of hiding the remaining
+# content
+if [[ ${#TEXT} -gt $WIDTH && $WIDTH ]]; then
+    NEWLINES=$((${#TEXT} / $WIDTH))
+    for ((INDEX=0; INDEX<=$NEWLINES;INDEX++)); do
+        APPEND=$(echo $TEXT | cut -b $(($WIDTH*$INDEX+1))-$(($WIDTH*$INDEX+$WIDTH)))
+        OUTPUT="$OUTPUT\n$APPEND"
+    done
+    TEXT=$OUTPUT
+fi
+
+for KEY in "${!PARAMETERS[@]}"; do
+    if [[ "${PARAMETERS[$KEY]}" && \
+           $(echo ${PARAMETERS[$KEY]} | sed 's/[0-9]//g') ]]; then
+                STRING="$STRING$(echo $KEY | \
+                    awk '{print tolower($0)}')=\"${PARAMETERS[$KEY]}\","
+    else
+        STRING="$STRING$(echo $KEY | \
+            awk '{print tolower($0)}')=${PARAMETERS[$KEY]},"
+    fi
+done
+
+if [[ $PRESET ]]; then
+    STRING="${STRING}preset=naughty.config.presets.${PRESET},"
+fi
+
+STRING="${STRING}text=\"$TEXT\"})"
+
+echo $STRING | awesome-client -
+

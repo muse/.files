@@ -94,9 +94,9 @@ while true; do
                  sed 's/_/ /g' | sed 's/[0-9][0-9]://g')
 
         if   [[ ${#OLD} -gt ${#NEW} ]]; then 
-            notify -f 10 -p low -t "An daemon has stopped" "$DAEMON"
+            naughty-notify --timeout 10 --preset low --title "An daemon has stopped" "$DAEMON"
         elif [[ ${#OLD} -lt ${#NEW} ]]; then 
-            notify -f 10 -p low -t "An daemon has started" "$DAEMON"
+            naughty-notify --timeout 10 --preset low --title "An daemon has started" "$DAEMON"
         fi
 
         OLD=$(GET_DAEMONS)

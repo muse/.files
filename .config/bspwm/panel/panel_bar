@@ -1,0 +1,164 @@
+#! /bin/sh
+#
+# Example panel for LemonBoy's bar
+
+. panel_colors
+
+num_mon=$(bspc query -M | wc -l)
+
+while read -r line ; do
+	case $line in
+		# Order Matters
+		H*)
+			#
+			music_infos="%{F$COLOR_STATUS_FG}%{B$COLOR_STATUS_BG} ${line#?} %{B-}%{F-}"
+			;;
+		K*)
+			# kern output
+			kern_infos="%{F$COLOR_STATUS_FG}%{B$COLOR_STATUS_BG} ${line#?} %{B-}%{F-}"
+			;;
+		I*)
+			# icon output
+			icon_infos="%{F$COLOR_STATUS_FG}%{B$COLOR_STATUS_BG} ${line#?} %{B-}%{F-}"
+			;;
+		N*)
+			# net output
+			net_infos="%{F$COLOR_STATUS_FG}%{B$COLOR_STATUS_BG} ${line#?}%{B-}%{F-}"
+			;;
+		V*)
+			# vol output
+			vol_infos="%{F$COLOR_STATUS_FG}%{B$COLOR_STATUS_BG} ${line#?} %{B-}%{F-}"
+			;;
+		C*)
+			# vol output
+			cpu_temp="${line#?} %{B-}%{F-}"
+			;;
+
+		B*)
+			# batt output
+			batt_infos="%{F$COLOR_STATUS_FG}%{B$COLOR_STATUS_BG} ${line#?} %{B-}%{F-}"
+			;;
+
+		Y*)
+			# gmail output
+			gmail_infos="%{F$COLOR_STATUS_FG}%{B$COLOR_STATUS_BG} ${line#?} %{B-}%{F-}"
+			;;
+
+		S*)
+			# clock output
+			clock_infos="%{F$COLOR_STATUS_FG}%{B$COLOR_STATUS_BG} ${line#?} %{B-}%{F-}"
+			;;
+		T*)
+			# xtitle output
+			title="%{F$COLOR_TITLE_FG}%{B$COLOR_TITLE_BG} ${line#?} %{B-}%{F-}"
+			;;
+		W*)
+			# bspwm internal state
+			wm_infos=""
+			IFS=':'
+			set -- ${line#?}
+			while [ $# -gt 0 ] ; do
+				item=$1
+				name=${item#?}
+				monocle=$(bspc control --get-status | grep -ci "LM")
+				case $item in
+					# M*)
+						# # active monitor
+						# if [ $num_mon -gt 1 ] ; then
+							# wm_infos="$wm_infos %{F$COLOR_ACTIVE_MONITOR_FG} %{F-}  "
+						# fi
+						# ;;
+					# m*)
+						# # inactive monitor
+						# if [ $num_mon -gt 1 ] ; then
+							# wm_infos="$wm_infos %{F$COLOR_INACTIVE_MONITOR_FG} %{F-}  "
+						# fi
+						# ;;
+					O*)
+						# focused occupied desktop
+						name=""
+						wm_infos="${wm_infos}%{F$COLOR_FOCUSED_OCCUPIED_FG} ${name} %{F-}"
+						;;
+					F*)
+						# focused free desktop
+						name=""
+						wm_infos="${wm_infos}%{F$COLOR_FOCUSED_FREE_FG} ${name} %{F-}"
+						;;
+					U*)
+						# focused urgent desktop
+						name=""
+						wm_infos="${wm_infos}%{F$COLOR_FOCUSED_URGENT_FG} ${name} %{F-}"
+						;;
+					o*)
+						# occupied desktop
+						# 
+						name=""
+						wm_infos="${wm_infos}%{F$COLOR_OCCUPIED_FG} ${name} %{F-}"
+						;;
+					f*)
+						# free desktop
+						name=""
+						wm_infos="${wm_infos}%{F$COLOR_FREE_FG} ${name} %{F-}"
+						;;
+					u*)
+						# urgent desktop
+						name=""
+						wm_infos="${wm_infos}%{F$COLOR_URGENT_FG} ${name} %{F-}"
+						;;
+					L*)
+						# layout
+						if [ "$name" == "T" ]
+						then
+							name=""
+						elif [ "$name" == "M" ]
+						then
+							name=""
+						fi
+						wm_infos="%{B$COLOR_LAYOUT_BG}%{B-}$wm_infos"
+						;;
+				esac
+				shift
+			done
+			;;
+	esac
+	#printf "%s\n" "%{A}${wm_infos}%{c}%{A}%{r}%{A:music:}%{A3:music3:}${music_infos}%{A}%{A}%{A:icon3:}%{A}%{A3:network3:}%{A:network:}${net_infos}%{A}%{A}%{A:volume:}%{A3:volume3:}${cpu_temp}${vol_infos}%{A}%{A}%{A:power:}%{A3:power3:}${batt_infos}%{A}%{A}%{A:clock:}%{A3:clock3:}${clock_infos}%{A}%{A}%{A:icon:}"
+    printf "%s\n" "${wm_infos}%{c}${clock_infos}%{r}${music_infos}${vol_infos}${batt_infos}${net_infos}  "
+done
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

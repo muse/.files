@@ -1,74 +1,71 @@
-!! Mirko van der Waal
 !! <mvdw at airmail dot cc>
 !! Are actual comments.
 !  Are alternatively commented options.
 
+URxvt.italicFont:xft:LiberationMono-Italic:size=8:style=italic
+URxvt.boldFont:xft:LiberationMono-Bold:size=8:style=bold
+URxvt.font:xft:LiberationMono-Regular:size=8
+
+!! Orgasm to the eyes.
+URxvt.background:       #170F0D
+URxvt.foreground:       #746C48
+URxvt.cursorColor:      #6BA16C
+URxvt.colorBD:          #C8B984
+URxvt.color0:           #392925
+URxvt.color8:           #544B2E
+URxvt.color1:           #98724C
+URxvt.color9:           #AF652F
+URxvt.color2:           #908F32
+URxvt.color10:          #C3C13D
+URxvt.color3:           #AA964C
+URxvt.color11:          #C8B55B
+URxvt.color4:           #7B854E
+URxvt.color12:          #70A16C
+URxvt.color5:           #6B5644
+URxvt.color13:          #98724C
+URxvt.color6:           #5C5142
+URxvt.color14:          #778725
+URxvt.color7:           #C8B55B
+URxvt.color15:          #E4DC8C
+
+!URxvt.background:  #121212
+!URxvt.foreground:  #BBEECC
+!URxvt.color0:      #353540
+!URxvt.color8:      #545466
+!URxvt.color1:      #8c5760
+!URxvt.color9:      #b26f7a
+!URxvt.color2:      #7b8c58
+!URxvt.color10:     #9db270
+!URxvt.color3:      #8c6e43
+!URxvt.color11:     #b28c55
+!URxvt.color4:      #58698c
+!URxvt.color12:     #7086b2
+!URxvt.color5:      #7b5e7d
+!URxvt.color13:     #9c77b2
+!URxvt.color6:      #66808c
+!URxvt.color14:     #82a2b2
+!URxvt.color7:      #8c8b8b
+!URxvt.color15:     #b8b8c8
+
+!! Miscellaneous.
+Xft.hintstyle:hintslight                                                        
+Xft.lcdfilter:lcddefault                                                        
 URxvt.internalBorder: 10
 URxvt.geometry: 64x32
-
-URxvt.font:xft:LiberationMono-Regular:size=8
-URxvt.boldFont:xft:LiberationMono-Bold:size=8:style=bold
-URxvt.italicFont:xft:LiberationMono-Italic:size=8:style=italic
-!URxvt.font:xft:terminus:size=9
-!URxvt.boldFont:xft:terminus:size=9:style=bold
-!URxvt.italicFont:xft:terminus:size=9:style=italic
-
-
-
-!! Pretty nice and wide, Good for clearer reading. 
-!URxvt.font: xft:ProggyCleanTT:size=12
-
-!! My default font.
-!! URxvt.font: xft:GohuFont:size=9
-
-!! Back and foreground color defaults.
-URxvt.background: #121212
-URxvt.foreground: #BBEECC
-
-
-!! black
-URxvt.color0 : #353540
-URxvt.color8 : #545466
-!! red
-URxvt.color1 : #8c5760
-URxvt.color9 : #b26f7a
-!! green
-URxvt.color2 : #7b8c58
-URxvt.color10 : #9db270
-!!yellow
-URxvt.color3 : #8c6e43
-URxvt.color11 : #b28c55
-!!blue
-URxvt.color4 : #58698c
-URxvt.color12 : #7086b2
-!!magenta
-URxvt.color5 : #7b5e7d
-URxvt.color13 : #9c77b2
-!!URxvt.cyan
-URxvt.color6 : #66808c
-URxvt.color14 : #82a2b2
-!!white
-URxvt.color7 : #8c8b8b
-Uxvt.color15 : #b8b8c8
-
-
-Xft.dpi:96                                                                      
 URxvt.letterSpace:0
 Xft.antialias:1                                                                 
 Xft.hinting:1                                                                   
-Xft.hintstyle:hintslight                                                        
 Xft.rgba:rgb                                                                    
-Xft.lcdfilter:lcddefault                                                        
+Xft.dpi:96                                                                      
 
-!! Enabling clickable links:
-URxvt.perl-ext-common: default,matcher
-URxvt.url-launcher: /usr/bin/firefox
-URxvt.matcher.button: 1
+!! Enabling clickable links.
+URxvt.perl-ext-common:  default,matcher
+URxvt.matcher.button:   1
+URxvt.url-launcher:     /usr/bin/firefox
 
-!! URxvt scrolling options and cursor style:
-URxvt*saveLines:            12000
-URxvt*scrollstyle:          plain
-URxvt*scrollBar:            false
-URxvt*cursorBlink:          true
-URxvt*cursorUnderline:      false
-
+!! URxvt scrolling options and cursor style.
+URxvt.cursorUnderline:  false
+URxvt.cursorBlink:      false
+URxvt.scrollstyle:      plain
+URxvt.saveLines:        16000
+URxvt.scrollBar:        false

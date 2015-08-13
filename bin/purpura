@@ -1,0 +1,237 @@
+#! /bin/sh
+# Copyright (C) 2015 Mirko van der Waal <mvdw at airmail dot cc>
+# Distributed under terms of the GNU2 license.
+
+SHORT="scmvnah"
+LONG="spread,catch,mimic,verbose,no-overwrite,all,help"
+FLAGS=$(getopt -o $(echo $SHORT) \
+               -l $(echo $LONG) \
+               -n "$0"  \
+               -- "$@")
+
+DIRECTORY=$HOME/.config/.files
+
+# Whenever something goes wrong where we miss or found wrong flags.
+if [ $? != 0 ]; then exit 1 ; fi
+eval set -- "$FLAGS"
+
+while true; do
+    case "$1" in
+        -n|--no-overwrite)
+            NO_OVERWRITE=/
+            shift ;;
+        -v|--verbose)
+            VERBOSE=/
+            shift ;;
+        -s|--spread) 
+            SPREAD=/ 
+            shift ;;
+        -c|--catch) 
+            CATCH=/
+            shift ;;
+        -m|--mimic)
+            MIMIC=/
+            shift ;;
+        -a|--all)
+            ALL=/
+            shift ;;
+        -h|--help)
+            echo "
+            $(tput bold)Catch or spread the .files from a clone$(tput sgr0)
+
+            -n, --no-overwrite
+                Only applies when --spreading. 
+                Doesn't spread the file when the file already exists on the to
+                be places location.
+
+            -a, --all
+                Only applies when --catching
+                Catches all the files from the pre-destined location. This
+                option is not recommended as it will copy the entire $HOME
+                directory
+
+            -v, --verbose
+                Return feedback about what has been done to stdout.
+
+            -s, --spread
+                Spread the .files to the computer.
+
+            -c, --catch
+                Catch (reload) the files back to the .files to prepare a push.
+
+            -m, --mimic
+                Imitate the process but print the destined moves to stdout.
+
+            <$(tput bold)mvdw at airmail dot cc$(tput sgr0)>
+            "
+            exit 0;;
+
+        --) shift  
+            break ;;
+        * ) break ;;
+    esac
+done
+
+if [[ $SPREAD ]]; then
+    for FILE in $(ls $DIRECTORY -a); do
+        # The unique 'bin' folder contains all binaries.
+        if [[ -d $DIRECTORY/$FILE && $FILE == 'bin' ]]; then
+            for BIN in $(ls $DIRECTORY/$FILE); do
+                if   [[ $MIMIC ]]; then
+                    if   [[ $NO_OVERWRITE && -e /usr/local/bin/$BIN ]]; then :
+                    else
+                        echo "[MIME]  $DIRECTORY/$FILE/$BIN > /usr/local/bin/$BIN"
+                    fi
+                elif [[ $VERBOSE ]]; then
+                    if   [[ $NO_OVERWRITE && -e /usr/local/bin/$BIN ]]; then :
+                    else
+                        echo "[PASTE] $DIRECTORY/$FILE/$BIN > /usr/local/bin/$BIN"
+                        cp $DIRECTORY/$FILE/$BIN /usr/local/bin/$BIN
+                    fi
+                else
+                    if   [[ $NO_OVERWRITE && -e /usr/local/bin/$BIN ]]; then :
+                    else
+                        cp $DIRECTORY/$FILE/$BIN /usr/local/bin/$BIN
+                    fi
+                fi
+            done
+        fi
+       
+        # The unique 'http' folder contains /srv/http backups.
+        if [[ -d $DIRECTORY/$FILE && $FILE == 'http' ]]; then
+            for HTTP in $(ls $DIRECTORY/$FILE); do
+                if   [[ $MIMIC ]]; then
+                    if   [[ $NO_OVERWRITE && -e /srv/http/$HTTP ]]; then :
+                    else
+                        echo "[MIME]  $DIRECTORY/$FILE/$HTTP > /srv/http/$HTTP"
+                    fi
+                elif [[ $VERBOSE ]]; then
+                    if   [[ $NO_OVERWRITE && -e /srv/http/$HTTP ]]; then :
+                    else
+                        echo "[PASTE] $DIRECTORY/$FILE/$HTTP > /srv/http/$HTTP"
+                        cp -r $DIRECTORY/$FILE/$HTTP /srv/http/$HTTP
+                    fi 
+                else
+                    if   [[ $NO_OVERWRITE && -e /srv/http/$HTTP ]]; then :
+                    else
+                        cp -r $DIRECTORY/$FILE/$HTTP /srv/http/$HTTP
+                    fi
+                fi
+            done
+        fi
+
+        # For all the others we by default assume the home directory.
+        if   [[ -f $DIRECTORY/$FILE && $FILE != "README.md" ]]; then
+            if   [[ $MIMIC ]]; then
+                if   [[ $NO_OVERWRITE && -e /home/mvdw/$FILE ]]; then :
+                else
+                    echo "[MIME]  $DIRECTORY/$FILE > /home/mvdw/$FILE"
+                fi
+            elif [[ $VERBOSE ]]; then
+                if   [[ $NO_OVERWRITE && -e /home/mvdw/$FILE ]]; then :
+                else
+                    echo "[PASTE] $DIRECTORY/$FILE > /home/mvdw/$FILE"
+                    cp $DIRECTORY/$FILE /home/mvdw/$FILE
+                fi
+            else
+                if   [[ $NO_OVERWRITE && -e /home/mvdw/$FILE ]]; then :
+                else
+                    cp $DIRECTORY/$FILE /home/mvdw/$FILE
+                fi
+            fi
+
+        # Blacklist various directories.
+        elif [[ -d $FILE && \
+                   $FILE != '.' && \
+                   $FILE != '..' && \
+                   $FILE != 'bin' && \
+                   $FILE != 'http' ]]; then
+            if   [[ $MIMIC ]]; then
+                if   [[ $NO_OVERWRITE && -e /home/mvdw/$FILE ]]; then :
+                else
+                    echo "[MIME]  $DIRECTORY/$FILE > /home/mvdw/$FILE"
+                fi
+            elif [[ $VERBOSE ]]; then
+                if   [[ $NO_OVERWRITE && -e /home/mvdw/$FILE ]]; then :
+                else
+                echo "[PASTE] $DIRECTORY/$FILE > /home/mvdw/$FILE"
+                    cp -r $DIRECTORY/$FILE /home/mvdw/$FILE
+                fi
+            else
+                if   [[ $NO_OVERWRITE && -e /home/mvdw/$FILE ]]; then :
+                else
+                    cp -r $DIRECTORY/$FILE /home/mvdw/$FILE
+                fi
+            fi
+        fi
+    done
+    exit 0
+fi
+
+if [[ $CATCH ]]; then
+    for FILE in $(ls $DIRECTORY -a); do
+        if [[ -d $DIRECTORY/$FILE && $FILE == 'bin' ]]; then
+            for BIN in $(ls $DIRECTORY/$FILE); do
+                if   [[ -e /usr/local/bin/$BIN  ]]; then
+                    if   [[ $MIMIC ]]; then
+                        echo "[MIME] /usr/local/bin/$BIN > $DIRECTORY/bin/$BIN"
+                    elif [[ $VERBOSE ]]; then
+                        echo "[COPY] /usr/local/bin/$BIN > $DIRECTORY/bin/$BIN"
+                        cp -r /usr/local/bin/$BIN $DIRECTORY/bin/$BIN 
+                    else
+                        cp -r /usr/local/bin/$BIN $DIRECTORY/bin/$BIN 
+                    fi
+                elif [[ $ALL ]]; then
+                    if   [[ $MIMIC ]]; then
+                        echo "[MIME] /usr/local/bin/$BIN > $DIRECTORY/bin/$BIN"
+                    elif [[ $VERBOSE ]]; then
+                        echo "[COPY] /usr/local/bin/$BIN > $DIRECTORY/bin/$BIN"
+                        cp -r /usr/local/bin/$BIN $DIRECTORY/bin/$BIN 
+                    else
+                        cp -r /usr/local/bin/$BIN $DIRECTORY/bin/$BIN 
+                    fi
+                fi
+            done
+        fi
+
+        if [[ -d $DIRECTORY/$FILE && $FILE == 'http' ]]; then
+            for HTTP in $(ls $DIRECTORY/$FILE); do
+                if   [[ -e /srv/http/$HTTP  ]]; then
+                    if   [[ $MIMIC ]]; then
+                        echo "[MIME] /srv/http/$HTTP > $DIRECTORY/http/$HTTP"
+                    elif [[ $VERBOSE ]]; then
+                        echo "[COPY] /srv/http/$HTTP > $DIRECTORY/http/$HTTP"
+                        cp -r /srv/http/$HTTP $DIRECTORY/http/$HTTP 
+                    else
+                        cp -r /srv/http/$HTTP $DIRECTORY/http/$HTTP 
+                    fi
+                elif [[ $ALL ]]; then
+                    if   [[ $MIMIC ]]; then
+                        echo "[MIME] /srv/http/$HTTP > $DIRECTORY/http/$HTTP"
+                    elif [[ $VERBOSE ]]; then
+                        echo "[COPY] /srv/http/$HTTP > $DIRECTORY/http/$HTTP"
+                        cp -r /srv/http/$HTTP $DIRECTORY/http/$HTTP 
+                    else
+                        cp -r /srv/http/$HTTP $DIRECTORY/http/$HTTP 
+                    fi
+                fi
+            done
+        fi
+         
+        if [[ -e $DIRECTORY/$FILE && \
+                 $FILE != '.' && \
+                 $FILE != '..' && \
+                 $FILE != 'bin' && \
+                 $FILE != 'http' && \
+                 $FILE != 'README.md' ]]; then
+            if   [[ $MIMIC ]]; then
+                echo "[MIME] $HOME/$FILE > $DIRECTORY/$FILE"
+            elif [[ $VERBOSE ]]; then
+                echo "[COPY] $HOME/$FILE > $DIRECTORY/$FILE"
+                cp -r $HOME/$FILE $DIRECTORY/$FILE
+            else
+                cp -r $HOME/$FILE $DIRECTORY/$FILE
+            fi
+        fi
+    done
+fi

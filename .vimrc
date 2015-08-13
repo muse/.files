@@ -1,4 +1,4 @@
-" Author: Mirko van der Waal
+" Author: mvdw
 " Email: <mvdw at airmail dot cc>
 " Decided to start building this .vimrc from scratch.
 " It were about time because the other ones were so filled with crap.
@@ -6,29 +6,25 @@
 
 " User defined variables used for various plugins (vim-templates, vim-snippets).
 let g:email = "mvdw at airmail dot cc"
-let g:username = "Mirko van der Waal"
+let g:username = "mvdw"
 let g:license = "GNU2"
 
 set encoding=utf8               " Set global encoding to UTF8
 set termencoding=utf-8          " Set specific term enncoding to UTF8
-
 set wildmenu                    " Enable <:e> "correctly".
 set wildmode=list:longest,full  " How we will showcase it and what to prioritize.
 set wildignore=*.o,*~,*.pyc     " Ignore the following files.
-
 set title                       " Enable costum title modification.
 set titlestring=%t:%l%r%m       " %f(Current file) %l(Current line) %r%m(Flags)
 set titlelen=24                 " The max length the title can have.
-
 set undofile                    " Save undo's after file closes
 set undodir=~/.vim/undo,/tmp    " Where to save undo histories
 set undolevels=1024             " How many undos.
 set undoreload=1024             " Number of lines to save for undo.
-
 set nowrap                      " Prevent vim from wrapping code in the current view.
 set sidescroll=5                " The minimal amount of columns to scroll.                                 
+set laststatus=2                " Enable statusline to be always active.
 set listchars+=extends:>        " What character to use for outwrapped text.
-
 set tw=80           " Ensure a recommended-width for vim.
 set number          " Show line numbers.
 set softtabstop=4   " While in fact a mix of spaces and <Tab>s is used.
@@ -48,18 +44,43 @@ set colorcolumn=80  " Visualise a row at said columns.
 set splitright      " When a new split is made with <:split> it is made below.
 set splitbelow      " When a new split is amde with <:vsplit> is is made right. 
 set noswapfile      " Don't make swap files -- they're a waste of time.
+set nobackup        " Don't make tmp files.
 set ignorecase      " Ignore case sensetive searches. (FOO == foo).
+set hls             " Highlight the found search terms throughout.
 set magic           " Allow ReExpr characters and use them to vaul.
+
+set statusline=%L:%l%=%m%{Type()}[%{Filesize()}]
+function! Cleanse(field)
+    return substitute(a:field,',','','g') 
+endfunc
+
+function! Filesize()
+    let bytes = getfsize(expand("%:p"))
+    if bytes <= 0
+        return "0B"
+    endif
+    if bytes < 1024
+        return bytes . "B"
+    else
+        return (bytes / 1024) . "K"
+    iendif
+endfunc
+
+function! Type()
+    if &fenc !~ "^$\|utf-8" || &bomb
+        return "[" . toupper(&fenc) . (&bomb ? "-BOM" : "" ) . "]"
+    else
+        return ""
+    endif
+endfunc
 
 " switching between number mode
 function ToggleNumber()
     if &relativenumber == 1
         set norelativenumber
         set number
-        " echo "Normal"
     else
         set relativenumber
-        " echo "Relative"
     endif
    return
 endfunc
@@ -72,13 +93,14 @@ autocmd BufReadPost *
     \   exe "normal! g`\"" |
     \ endif
 
-" Here we load pathogen, makes plugins so much easier.
 call pathogen#infect()
+filetype plugin indent on
 
 " Ensure syntax highlighting is on.
 syntax on           
-" Set the current colorscheme.
-colors sigal256
+
+" Set the current colorscheme (wip).
+colors autumn
 
 " Unknown filetypes to vim, some make sense -- others don't.
 autocmd BufNewFile,BufRead *.json set ft=javascript
@@ -101,18 +123,20 @@ nnoremap <Leader>y :w !xclip <CR><CR>
 nnoremap <Leader>p :r !xclip -o <CR>
 
 " BufTabLine variables, lets and sets
-let g:buftabline_indicators=1
+let g:buftabline_indicators=0
 
 " UltiSnips variables, lets and sets
 let g:UltiSnipsExpandTrigger="<TAB>"
 let g:UltiSnipsJumpForwardTrigger="<TAB>"
 let g:UltiSnipsJumpBackwardTrigger="<S-TAB>"
 
+let g:slimv_swank_cmd = '! urxvt -e sbcl --load /home/mvdw/.vim/bundle/slimv/smilestart-swank.lisp &'
+
 " Python-mode variables, lets and sets
 let g:pymode = 1
 let g:pymode_syntax_all = 1
 let g:pymode_warnings = 0
-let g:pymode_indent = 1
+let g:pymode_indent = 0
 let g:pymode_doc = 1
 let g:pymode_lint = 0
 let g:pymode_rope = 0

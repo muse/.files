@@ -1,0 +1,11 @@
+#!/bin/bash
+# Blur the desktop.
+scrot -e 'convert -blur 0x3 $f /tmp/blur.png; rm $f'
+# If there's a lockfile merge it with the blured desktop.
+if [[ -f /home/mvdw/.config/lock.png ]]; then
+    convert -gravity center \
+            -composite /tmp/blur.png /home/mvdw/.config/lock.png /tmp/compose.png
+fi
+i3lock -u -i /tmp/compose.png
+# Cleanup.
+rm /tmp/blur.png /tmp/compose.png

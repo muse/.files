@@ -7,24 +7,23 @@
 # A: Let's see, can you use a shell script for that or does it need a C program?
 # 
 # The following script will take care of:
-#   * Downloading and builing yaourt and package-query
+#   * Download primarily yaourt and the dependencies, but can take care of any
+#   * Arch user repository tar.gz ball. 
 #
-#   * Install the default set of currently used applications
+#   * Install the default set of currently used applications & packages.
 #
-#   * Apply the hostname when not set.
+#   * Apply the hostname when not set (correctly).
+#
+#   * Apply the correct settings for the touchpad driver.
 # 
-#   * Move the all the files from the specified github repository to their
-#     according path or home directory when none specified.
-# 
-#   * Merge, reload, sync and clean up.
-# 
+#   * Move the all the files from the specified github repository to their 
+#   * according location.
 
 OFFICIAL_PACKAGES='
     xorg-apps xorg-server xorg-server-utils xorg-xinit xterm ttf-liberation 
     xf86-video-intel xf86-video-vesa xf86-input-synaptics vim networkmanager 
-	openssh pass rxvt-unicode firefox thunderbird mpv network-manager-applet
-	gnome-font-viewer gnome-alsamixer acpi fortune-mod
-'
+	openssh pass firefox thunderbird mpv network-manager-applet
+	gnome-font-viewer gnome-alsamixer acpi fortune-mod weechat npm vicious'
 
 AUR_PACKAGES=(
     https://aur.archlinux.org/packages/pa/package-query/package-query.tar.gz
@@ -34,11 +33,11 @@ AUR_PACKAGES=(
 HOSTNAME='hcra'
 GITHUB='/Imakethings/.files'
 
-# Apply the hostname.
+# Apply the hostname when not equal to the required one.
 [[ -f /etc/hostname/ ]] && \
-    [[ $(cat /etc/hostname) == $HOSTNAME ]] && \
+    [[ $(cat /etc/hostname) != $HOSTNAME ]] && \
         sudo echo $HOSTNAME >> /etc/hostname
-
+        
 # Install all the AUR packages.
 for PACKAGE in "${AUR_PACKAGES[@]}"; do
     # Obtain the name and the tar.gz
@@ -53,7 +52,6 @@ done
 
 # Install the official packages.
 sudo pacman -S $(echo $OFFICIAL_PACKAGES)
-
 
 if [[ -f /usr/bin/git ]]; then
     git clone 'https://github.com'$GITHUB /tmp

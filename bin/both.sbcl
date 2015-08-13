@@ -1,0 +1,6 @@
+#!/bin/bash
+FILE=$(echo "$1"|cut -d. -f1)
+if sbcl --noinform --eval "(compile-file \"$FILE.lsp\")" --eval "(quit)" > /dev/null
+then
+    sbcl --noinform --load "$FILE.fasl" --quit --end-toplevel-options "$@"
+fi

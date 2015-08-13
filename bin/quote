@@ -1,0 +1,23 @@
+#!/bin/env bash
+
+F=3 B=4
+for J in F B; do
+    for I in {0..7}; do
+        printf -v $J$I %b "\033[${!J}${I}m"
+    done
+done
+
+D=$'\033[1m'
+T=$'\033[0m'
+V=$'\033[7m'
+
+cat << EOF
+    
+    "$F4$(fortune -s)"
+    
+    $F6${D}Packages:$T$F4 $(pacman -Qq|wc -l)
+    $F6${D}Uptime:$T$F4 $(uptime -p|sed 's/up //g')
+    $F6${D}OS:$T$F4 $(echo "print(\"$(uname -r|sed 's/[0-9\.\-]//g'|awk '{print tolower($0)}')\".capitalize())"|python -) linux
+
+EOF
+

@@ -1,0 +1,31 @@
+#!/bin/sh
+
+bspc config border_width 0
+bspc config window_gap   5
+
+bspc monitor -d www term chat files other
+
+bspc config initial_polarity second_child
+
+bspc config top_padding 0
+bspc config bottom_padding 0
+bspc config left_padding 0
+bspc config right_padding 0
+
+# Visual options
+bspc config split_ratio         0.50
+bspc config borderless_monocle  true
+bspc config gapless_monocle     true
+bspc config focus_follows_pointer true
+bspc config auto_alternate true
+bspc config auto_cancel true
+bspc config normal_border_color "#353540"
+bspc config active_border_color "#545466"
+bspc config focused_border_color "#545466"
+bspc config presel_border_color "#ffffff"
+bspc config urgent_border_color "#ffffff"
+bspc config focused_locked_border_color "#545466"
+bspc config normal_frame_opacity 0.0
+bspc config focused_frame_opacity 0.0
+
+/home/mvdw/.config/bspwm/panel/panel
