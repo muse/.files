@@ -1,31 +1,14 @@
 #!/bin/bash
-while read data; do
-    if [ "$data" == "music" ]; then
-		cmd="~/bin/toggle-conky.sh music"
-	elif [ "$data" == "music3" ]; then
-		cmd="urxvt -e 'ncmpcpp'"
-	elif [ "$data" == "network" ]; then
-		cmd="echo $data"
-	elif [ "$data" == "network3" ]; then
-		cmd="urxvt -e 'nmtui'"
-	elif [ "$data" == "kern" ]; then
-		cmd="~/bin/toggle-conky.sh pac"
-	elif [ "$data" == "volume" ]; then
-		cmd="echo $data"
-	elif [ "$data" == "volume3" ]; then
-		cmd="pavucontrol"
-	elif [ "$data" == "power" ]; then
-		cmd="~/bin/toggle-conky.sh power"
-	elif [ "$data" == "power3" ]; then
-		cmd="~/bin/redshifter.sh"
-	elif [ "$data" == "clock" ]; then
-		cmd="~/bin/toggle-conky.sh cal"
-	elif [ "$data" == "icon" ]; then
-		cmd="~/.config/bspwm/panel/stalonetray.sh"
-	elif [ "$data" == "icon3" ]; then
-		cmd="~/.config/bspwm/panel/bluetooth.sh"
+
+while read DATA; do
+    if   [[ "$DATA" == "MUSIC" ]]; then
+		CMD="urxvt -e 'ncmpcpp'"
+	elif [[ "$DATA" == "NETWORK" ]]; then
+		CMD="urxvt -e 'nmtui'"
+	elif [[ "$DATA" == "VOLUME" ]]; then
+		CMD="urxvt -e 'alsamixer'"
 	else
-        cmd="notify-send 'Fail'"
+        CMD="notify-send 'Fail'"
 	fi
-	echo "$cmd &"
+	echo "$CMD &"
 done
