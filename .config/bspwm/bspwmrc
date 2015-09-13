@@ -1,5 +1,7 @@
 #!/bin/sh
 
+THEME_NAME=Delight
+
 bspc config border_width 0
 bspc config window_gap   5
 
@@ -28,4 +30,4 @@ bspc config focused_locked_border_color "#545466"
 bspc config normal_frame_opacity 0.0
 bspc config focused_frame_opacity 0.0
 
-/home/mvdw/.config/bspwm/panel/panel
+/home/mvdw/.config/bspwm/$THEME_NAME/panel

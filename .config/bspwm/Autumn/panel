@@ -1,0 +1,173 @@
+#!/bin/env bash
+#  Author: Mirko van der Waal 
+#  Mail: <mvdw at airmail dot cc>
+#  Distributed under terms of the GNU2 license.
+#
+#  Copyright (C) 2015 
+#   
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#   
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#  GNU General Public License for more details.
+#   
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, see <http://www.gnu.org/licenses/>.
+#  
+#  A small collection of functions to display specific pieces of content. It has
+#  been optimised as far as I can think (unset is not needed). 
+#
+#  Fonts: 
+#   * Siji          # Used as icon font.
+#   * Lemon         # Used as default character font.
+#  Mentionable dependencies: 
+#   * lemonbar-xft  # I'm using a xft patched version to load the character
+#                   # font. I highly recommend this If you plan on changing it. 
+#   * iwconfig      # I added it because I am not sure wheter it comes by default.
+#   * acpi        
+#   * amixer
+#   * mpc
+
+export HEIGHT=20
+export FIFO=/tmp/panel-fifo
+export FFC="Lemon-8"
+export FFI="-wuncon-siji-medium-r-normal--10-100-75-75-c-80-iso10646-1"
+export FIFO HEIGHT FFC FFI
+export PATH=$PATH:~/.config/bspwm/panel/
+
+. panel_colors
+
+# What the delay for reloading should be. This is applied to all functions
+# below. You can optionally modify the 'CLOCK' function to reload every 60
+# seconds when you are not tracking seconds.
+CONST_RELOAD=1
+
+# We apply the colors after the the value has been obtain/created. This will
+# allow us to seperate multiple values and color/style them differently
+# eventhough they're in the same function. This will also prevent 160+ character
+# lines so we can stick to the 80 characer line rule.
+COLOR_STATUS() {
+    echo "%{F$COLOR_STATUS_FG}%{B$COLOR_STATUS_BG}$@%{B-}%{F-}"
+}
+
+COLOR_ICON() {
+    echo "%{F$COLOR_ICON_FG}%{B$COLOR_ICON_BG}$@%{B-}%{F-}"
+}
+
+CLOCK() {
+	while :; do
+        # The default AM/PM equivalent is lowercase hence awk.
+        TIME=$(date "+%I:%M %p" | awk '{print toupper($0)}') 
+        echo "S$(COLOR_STATUS $TIME)"
+        sleep $CONST_RELOAD
+	done
+}
+
+VOLUME() {
+	while :; do
+        VOLUME=$(amixer sget Master | sed -n "0,/.*\[\([0-9]\+\)%\].*/s//\1/p")
+        ACTIVE=$(amixer sget Master | tail -n1 | awk '{print $(NF)}')
+        if   [[ $VOLUME -eq 0 || $ACTIVE = '[off]' ]]; then 
+            ICON=''
+        elif [[ $VOLUME -gt 50 ]]; then 
+            ICON=''
+        else 
+            ICON=''
+        fi
+        echo "V$(COLOR_ICON $ICON) $(COLOR_STATUS $VOLUME%)"
+        sleep $CONST_RELOAD
+	done
+}
+
+BATTERY() {
+    while :; do
+        PERCENTAGE=$(acpi --battery | awk '{gsub(/,/, "");} {print $4}' | sed 's/.$//')
+        if   [[ $PERCENTAGE -le 10 ]]; then ICON=''
+        elif [[ $PERCENTAGE -le 25 ]]; then ICON=''
+        elif [[ $PERCENTAGE -le 50 ]]; then ICON=''
+        elif [[ $PERCENTAGE -le 75 ]]; then ICON=''
+        elif [[ $PERCENTAGE -le 90 ]]; then ICON=''
+        elif [[ $PERCENTAGE -gt 90 ]]; then ICON=''
+        fi
+        if [[ $(acpi -a | grep on) ]]; then ICON=''
+        fi
+        echo "B$(COLOR_ICON $ICON) $(COLOR_STATUS $PERCENTAGE%)"
+        sleep $CONST_RELOAD
+	done
+}
+
+NETWORK() {
+	while :; do
+        WIFISTATUS=$(cat /sys/class/net/wlp*/operstate)
+        ETHNSTATUS=$(cat /sys/class/net/enp*/operstate)
+        MIN=$(iwconfig | grep 'Link Quality=' | awk '{gsub(/[=/]/," "); print $3}')
+        MAX=$(iwconfig | grep 'Link Quality=' | awk '{gsub(/[=/]/," "); print $4}')
+        if [[ "$WIFISTATUS" == "up" ]]; then
+            PERCENTAGE=$(echo $MIN*100/$MAX | bc)
+            case $PERCENTAGE in
+                [1-9] ) ICON="" ;;
+                [1-3]*) ICON="" ;;
+                [4-5]*) ICON="" ;;
+                [6-7]*) ICON="" ;;
+                *)      ICON="" ;; 
+            esac
+        elif [[ "$ETHNSTATUS" == "up" ]]; then
+            ICON=""
+        else
+            ICON=""
+        fi
+        echo "N$(COLOR_ICON $ICON)"
+        sleep $CONST_RELOAD
+	done
+}
+
+MUSIC() {
+    while :; do
+        SONG=$(mpc current)
+        if [[ $(mpc status|wc -l) -le 2 ]]; then
+            STATE="STOPPED"
+        else
+            STATE=$(mpc status | head -n2 | tail -n1 | \
+                    awk '{print toupper($1)}'| sed 's/\[//g;s/\]//g')
+        fi
+        if [[ $(echo $SONG | wc -c ) -gt 48 ]]; then
+            SONG="$(echo $SONG | cut -b 1-48) ~"
+        fi
+        if [[ $STATE == "PAUSED" ]]; then
+            ICON="" 
+        else
+            ICON=""
+        fi
+        echo "H$(COLOR_ICON $ICON) $(COLOR_STATUS $SONG)"
+        sleep $CONST_RELOAD
+    done
+}
+
+# Prevent running another panel when already existant. This however still means
+# you need to 'killall panel' to remove the currently exisiting panel. 
+if [ $(pgrep -cx panel) -gt 1 ]; then
+	printf "%s\n" "The panel is already running." >&2
+	exit 1
+fi
+
+trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
+
+[[ -e "$FIFO" ]] && rm "$FIFO"
+
+mkfifo "$FIFO"
+
+bspc control --subscribe > "$FIFO" &
+bspc config bottom_padding $HEIGHT
+
+BATTERY > "$FIFO" &
+NETWORK > "$FIFO" &
+VOLUME > "$FIFO" &
+CLOCK > "$FIFO" &
+MUSIC > "$FIFO" &
+
+cat "$FIFO" | panel_bar | lemonbar -b -g x$HEIGHT -f "$FFC" -f "$FFI" -F "$COLOR_FOREGROUND" -B "$COLOR_BACKGROUND" | panel_clean | sh &
+wait

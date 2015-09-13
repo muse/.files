@@ -1,0 +1,108 @@
+#!/bin/env bash
+#  Author: Mirko van der Waal 
+#  Mail: <mvdw at airmail dot cc>
+#  Distributed under terms of the GNU2 license.
+#
+#  Copyright (C) 2015 
+#   
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#   
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#  GNU General Public License for more details.
+#   
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, see <http://www.gnu.org/licenses/>.
+#
+
+. panel_colors
+
+while read -r LINE; do
+    case $LINE in
+		# Order matters!
+		H*) CASE_MUSIC="${LINE#?}"
+            ;;
+		N*) CASE_NETWORK="${LINE#?}"
+			;;
+		V*) CASE_VOLUME="${LINE#?}"
+			;;
+		B*) CASE_BATTERY="${LINE#?}"
+			;;
+		S*) CASE_CLOCK="${LINE#?}"
+			;;
+		W*) CASE_WINDOW=""
+			IFS=':'
+			set -- ${LINE#?}
+			while [[ $# -gt 0 ]]; do
+				case $1 in
+				    O*) CASE_WINDOW="${CASE_WINDOW}%{F$COLOR_FOCUSED_FG}  %{F-}"
+						;;
+					F*) CASE_WINDOW="${CASE_WINDOW}%{F$COLOR_FOCUSED_FG}  %{F-}"
+						;;
+					U*) CASE_WINDOW="${CASE_WINDOW}%{F$COLOR_FOCUSED_FG}  %{F-}"
+					    ;;
+					o*) CASE_WINDOW="${CASE_WINDOW}%{F$COLOR_PASSIVE_FG}  %{F-}"
+						;;
+					f*) CASE_WINDOW="${CASE_WINDOW}%{F$COLOR_PASSIVE_FG}  %{F-}"
+						;;
+					u*) CASE_WINDOW="${CASE_WINDOW}%{F$COLOR_PASSIVE_FG}  %{F-}"
+						;;
+				esac
+				shift
+			done
+			;;
+	esac
+
+    # We link everything to a shorthand variable to once again prevent massive
+    # unmanagable lines.
+    WM="${CASE_WINDOW}"
+    CL="${CASE_CLOCK}"
+    MU="%{A:MUSIC:}${CASE_MUSIC}%{A}"
+    VO="%{A:VOLUME:}${CASE_VOLUME}%{A}"
+    BA="${CASE_BATTERY}"
+    NE="%{A:NETWORK:}${CASE_NETWORK}%{A}"
+
+    printf "%s\n" "${WM}%{c}${CL}%{r}${MU}   ${VO}   ${BA}   ${NE}  "
+done
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
