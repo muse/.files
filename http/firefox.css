@@ -1,13 +1,12 @@
-/* Author: Mvdw
- * Email: <mvdw at airmail dot cc> 
- */
-
-/* "Since it's a foregone conclusion that Microsoft will be littering its XML
-with pointers to Win32-based components, the best that can be said about
-its adoption of XML is that it will make it easier for browsers and
-applications on non-Windows platforms to understand which parts of the
-document it must ignore."
-        -- Nicholas Petreley, "Computerworld", 3 September, 2001
+/* 
+ * Contact: <mvdw at airmail dot cc>
+ *
+ * "Since it's a foregone conclusion that Microsoft will be littering its XML
+ * with pointers to Win32-based components, the best that can be said about
+ * its adoption of XML is that it will make it easier for browsers and
+ * applications on non-Windows platforms to understand which parts of the
+ * document it must ignore."
+ *      -- Nicholas Petreley, "Computerworld", 3 September, 2001
 */
 
 @namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
