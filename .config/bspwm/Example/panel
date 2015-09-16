@@ -1,0 +1,238 @@
+#!/bin/env bash
+#  Author: Mirko van der Waal 
+#  Mail: <mvdw at airmail dot cc>
+#  Distributed under terms of the GNU2 license.
+#
+#  Copyright (C) 2015 
+#   
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#   
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#  GNU General Public License for more details.
+#   
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, see <http://www.gnu.org/licenses/>.
+#  
+#  A sample lemonbar to use with bspwm. Should easily be modifiable to use
+#  another window manager.
+
+THEME_NAME="Example"
+
+# FIFO special file (a named pipe) is similar to a pipe, except that it is 
+# accessed as part of the file system. It can be opened by multiple processes 
+# for reading or writing. When processes are exchanging data via the FIFO, 
+# the kernel passes all data internally without writing it to the file system. 
+# Thus, the FIFO special file has no contents on the file system, the file 
+# system entry merely serves as a reference point so that processes can access 
+# the pipe using a name in the file system. 
+
+export FIFO=/tmp/panel-fifo
+
+# "Constant" values used throughout the script.
+
+COLOR_PASSIVE_BG='#FFFEFEFE'
+COLOR_PASSIVE_FG='#FF1A1F16'
+
+COLOR_FOCUSED_BG='#FFFEFEFE'
+COLOR_FOCUSED_FG='#FF313930'
+
+COLOR_BACKGROUND='#FFFEFEFE'
+COLOR_FOREGROUND='#FF313930'
+
+COLOR_STATUS_BG='#FFFEFEFE'
+COLOR_STATUS_FG='#FF313930'
+
+COLOR_ICON_BG='#FFFEFEFE'
+COLOR_ICON_FG='#FF1A1F16'
+
+CONST_GLYPHS="-wuncon-siji-medium-r-normal--10-100-75-75-c-80-iso10646-1"
+CONST_NORMAL="Lemon-8"
+CONST_HEIGHT=20
+CONST_RELOAD=1
+
+# We apply the colors after the the value has been obtain/created. This will
+# allow us to seperate multiple values and color/style them differently
+# eventhough they're in the same function. This will also prevent 160+ character
+# lines so we can stick to the 80 characer line rule.
+
+COLOR_STATUS() {
+    echo "%{F$COLOR_STATUS_FG}%{B$COLOR_STATUS_BG}$@%{B-}%{F-}"
+}
+
+COLOR_ICON() {
+    echo "%{F$COLOR_ICON_FG}%{B$COLOR_ICON_BG}$@%{B-}%{F-}"
+}
+
+# This ensures that everything is displayed and displayed correctly.
+# There's quite a bit going on in here so I will briefly try to explain what is
+# happening. 
+#
+# The first case which reads as LINE accepts and sorts the FIFO content. If a
+# string prefixed with N* is found it will assign it as CASE_NETWORK. This will
+# help us out later when we're going to decide where we want things to display
+# on our bar.
+# 
+# The second (nested) case which reads the first argument after setting LINE;
+# handles the desktops. It will tell you what desktop is currently active,
+# occupied or free.
+#
+# At the bottom we make a quick reference to the existing variables. 
+# This is because printf only allows a single line string and formatting with
+# long variables would eventually become unreadable. In the reference variable
+# we can optionally specify a handler that activates/toggles an application
+# on click. 
+#
+# Create a clickable area starting from the current position, 
+# when the area is clicked command is executed. The area is closed when a 
+# A token, not followed by : is encountered.
+# 
+# Eg. %{A:reboot:} Click here to reboot %{A}
+# 
+# The button field is optional, it defaults to the left button, and it's a 
+# number ranging from 1 to 5 which maps to the left, middle, right, scroll up 
+# and scroll down movements. Your mileage may vary.
+# 
+# Nested clickable areas can trigger different commands.
+# 
+# Eg. %{A:reboot:}%{A3:halt:} Left click to reboot, 
+# right click to shutdown %{A}%{A}
+# 
+# We're using a varation on this implementation which you can read 
+# about a little below here at the HANDLE function.
+# 
+# The final thing I would like to cover is the formatting in the printf string.
+# Apart from embedding the reference variables we also use %{c} and %{r}.
+# There's also %{l} which has been omitted because it is default.
+# 
+# Every bit of text that comes before the %{c} (or after the %{l} when
+# specified} will be alligned on the left side of the bar. Everything that comes
+# after the %{c} will be centered and everything that comes after the %{r} will
+# be alligned on the right side of the bar.
+
+DISPLAY() {
+    while read -r LINE; do
+        case $LINE in
+            # Order matters!
+            S*) CASE_CLOCK="${LINE#?}"
+                ;;
+            W*) CASE_WINDOW=""
+                IFS=':'
+                set -- ${LINE#?}
+                while [[ $# -gt 0 ]]; do
+                    case $1 in
+                        O*) CASE_WINDOW="${CASE_WINDOW}%{F$COLOR_FOCUSED_FG}  %{F-}"
+                            ;;
+                        F*) CASE_WINDOW="${CASE_WINDOW}%{F$COLOR_FOCUSED_FG}  %{F-}"
+                            ;;
+                        U*) CASE_WINDOW="${CASE_WINDOW}%{F$COLOR_FOCUSED_FG}  %{F-}"
+                            ;;
+                        o*) CASE_WINDOW="${CASE_WINDOW}%{F$COLOR_PASSIVE_FG}  %{F-}"
+                            ;;
+                        f*) CASE_WINDOW="${CASE_WINDOW}%{F$COLOR_PASSIVE_FG}  %{F-}"
+                            ;;
+                        u*) CASE_WINDOW="${CASE_WINDOW}%{F$COLOR_PASSIVE_FG}  %{F-}"
+                            ;;
+                    esac
+                    shift
+                done
+                ;;
+        esac
+
+        # We link everything to a shorthand variable to once again prevent massive
+        # unmanagable lines.
+        WM="${CASE_WINDOW}"
+        CL="%{A:CLOCK:}${CASE_CLOCK}%{A}"
+
+        printf "%s\n" "${WM}%{c}${CL}%{r}"
+    done
+}
+
+# Run a command depending on the obtained handle. This function reads from DATA
+# and tries to find comparable strings which were specified in the DISPLAY
+# function. If found it will set the command and at the end -- run it.
+#
+# "Why don't you run the command straight away?"
+#
+# Say that you find 2 matches; it will run 2 applications straight through 
+# eachother. This is not desired (expected) behaviour.
+
+HANDLE() {
+    while read DATA; do
+        if [[ "$DATA" == "CLOCK" ]]; then
+            CMD="urxvt -e 'clock'"
+        else
+            CMD="notify-send 'Fail'"
+        fi
+        echo "$CMD &"
+    done
+}
+
+# Add any new function here. There's a few key things to making a correct
+# function. The first thing would be to wrap the code in the function in a
+# endless loop.
+#
+# "B-but endless loops are bad RIGHT!?"
+#
+# Well, they are when not used correctly. We will take care of this a little
+# later. The reason why we wrap it in an endless loop is because we need to
+# update the content in the bar. We don't want to respawn the bar everytime we
+# do so; hence we make an endless loop. 
+# 
+# The second thing we do is ensure that right before we close the loop we put an
+# 'sleep $CONST_RELOAD' or 'sleep 1'. This will pause the loop whenever the code
+# within was ran and waits the specified time. 
+#
+# The third and last thing is also the most important thing. We need to 'return'
+# a string so we can display something later. Every function needs a unique
+# value which is set when using 'echo'. You use this value to later catch it in
+# the DISPLAY function. 
+#
+# echo "SANYTHINGHERE"
+# 
+# Will use "S" as the unique value and "ANYTHINGHERE" as an actual value.
+
+CLOCK() {
+	while :; do
+        # The default AM/PM equivalent is lowercase hence awk.
+        TIME=$(date "+%I:%M %p" | awk '{print toupper($0)}') 
+        echo "S$(COLOR_STATUS $TIME)"
+        sleep $CONST_RELOAD
+	done
+}
+
+# Prevent running another panel when already existant. This however still
+# means you need to 'killall panel' to remove the currently exisiting panel. 
+
+if [ $(pgrep -cx panel) -gt 1 ]; then
+	printf "%s\n" "The panel is already running." >&2
+	exit 1
+fi
+
+trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
+
+[[ -e "$FIFO" ]] && rm "$FIFO"
+
+mkfifo "$FIFO"
+
+# Attach the lemonbar to bspwm. 
+# You should leave this untouched unless you know what you're doing.
+
+bspc control --subscribe > "$FIFO" &
+bspc config top_padding $CONST_HEIGHT
+
+# Decided what output is being send to the FIFO file. Comment anything you would
+# like to disable; that will allow you to create any amount of functions without
+# directly using them.
+
+CLOCK > "$FIFO" &
+
+# This eventually starts the bar. 
+# You should leave this untouched unless you know what you're doing.
+
+cat "$FIFO" | DISPLAY | lemonbar -g x$CONST_HEIGHT -f "$CONST_NORMAL" -f "$CONST_GLYPHS" -F "$COLOR_FOREGROUND" -B "$COLOR_BACKGROUND" | HANDLE | sh &
+wait
