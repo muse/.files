@@ -1,150 +1,121 @@
-" Author: mvdw
-" Email: <mvdw at airmail dot cc>
+" Maintainer: Mirko van der Waal <mvdw at airmail dot cc>
+"
 " Decided to start building this .vimrc from scratch.
 " It were about time because the other ones were so filled with crap.
-" If any of the following things are unclear, most can be solved with <:help arg>
-
-" User defined variables used for various plugins (vim-templates, vim-snippets).
-let g:email = "mvdw at airmail dot cc"
-let g:username = "mvdw"
-let g:license = "GNU2"
-
-set encoding=utf8               " Set global encoding to UTF8
-set termencoding=utf-8          " Set specific term enncoding to UTF8
-set wildmenu                    " Enable <:e> "correctly".
-set wildmode=list:longest,full  " How we will showcase it and what to prioritize.
-set wildignore=*.o,*~,*.pyc     " Ignore the following files.
-set title                       " Enable costum title modification.
-set titlestring=%t:%l%r%m       " %f(Current file) %l(Current line) %r%m(Flags)
-set titlelen=24                 " The max length the title can have.
-set undofile                    " Save undo's after file closes
-set undodir=~/.vim/undo,/tmp    " Where to save undo histories
-set undolevels=1024             " How many undos.
-set undoreload=1024             " Number of lines to save for undo.
-set nowrap                      " Prevent vim from wrapping code in the current view.
-set sidescroll=5                " The minimal amount of columns to scroll.                                 
-set laststatus=2                " Enable statusline to be always active.
-set listchars+=extends:>        " What character to use for outwrapped text.
-set tw=80           " Ensure a recommended-width for vim.
-set number          " Show line numbers.
-set softtabstop=4   " While in fact a mix of spaces and <Tab>s is used.
-set shiftwidth=4    " Number of spaces to use for each step of (auto)indent.
-set tabstop=4       " <Tab>width to 4 spaces.
-set smartindent     " Works nearly the same as smarttab.
-set smarttab        " Keep the logical indenting when already indented.
-set autoindent      " Copy indent from current line when starting a new line.
-set hidden          " It hides buffers instead of closing them. 
-set expandtab       " Expand to a set tabwidth to ease indenting.
-set ttyfast         " Indicates a fast terminal connection.  
-                    " More characters will be sent to the screen for redrawing
-set lazyredraw      " Waits patiently until the screen has finished drawing.
-set showcmd         " Displays additional line and block data.
-set iskeyword+=-    " Eases on <:cw>
-set colorcolumn=80  " Visualise a row at said columns.
-set splitright      " When a new split is made with <:split> it is made below.
-set splitbelow      " When a new split is amde with <:vsplit> is is made right. 
-set noswapfile      " Don't make swap files -- they're a waste of time.
-set nobackup        " Don't make tmp files.
-set ignorecase      " Ignore case sensetive searches. (FOO == foo).
-set hls             " Highlight the found search terms throughout.
-set magic           " Allow ReExpr characters and use them to vaul.
-
-set statusline=%L:%l%=%m%{Type()}[%{Filesize()}]
-function! Cleanse(field)
-    return substitute(a:field,',','','g') 
-endfunc
-
-function! Filesize()
-    let bytes = getfsize(expand("%:p"))
-    if bytes <= 0
-        return "0B"
-    endif
-    if bytes < 1024
-        return bytes . "B"
-    else
-        return (bytes / 1024) . "K"
-    iendif
-endfunc
-
-function! Type()
-    if &fenc !~ "^$\|utf-8" || &bomb
-        return "[" . toupper(&fenc) . (&bomb ? "-BOM" : "" ) . "]"
-    else
-        return ""
-    endif
-endfunc
-
-" switching between number mode
-function ToggleNumber()
-    if &relativenumber == 1
-        set norelativenumber
-        set number
-    else
-        set relativenumber
-    endif
-   return
-endfunc
-
-nnoremap <C-n> :call ToggleNumber() <CR>
-
-" Return to last edit position when opening files.
-autocmd BufReadPost *
-    \ if line("'\"") > 0 && line("'\"") <= line("$") |
-    \   exe "normal! g`\"" |
-    \ endif
+" If any of the following things are unclear, most can be solved with <:help argument>
 
 call pathogen#infect()
 filetype plugin indent on
-
-" Ensure syntax highlighting is on.
-syntax on           
-
-" Set the current colorscheme (wip).
+syntax on
 colors autumn
 
-" Unknown filetypes to vim, some make sense -- others don't.
-autocmd BufNewFile,BufRead *.json set ft=javascript
-autocmd BufNewFile,BufRead *.md set ft=markdown
-autocmd BufNewFile,BufRead *.csst set ft=css
+if has("python") && v:version > 700
+    " Extend (append) the original python path with the location of our vim
+    " python scripts. It'll be easier for us to call them later this way.
+    " We're using '__import__' in favor 'import' will discard the sys module
+    " after the path was extended.
+    python __import__("sys").path.append("/home/mvdw/.vim/python")
 
-" Switch these around for faster user -- personal preference.
-nnoremap : ;
-nnoremap ; :
+    " Import on a unique line to be more efficient (otherwise you would import
+    " the module everytime when calling the map).
+    python from pale import Pale
+    nnoremap <C-n> :python Pale().post() <CR>
+endif
 
-" Tab and buffer manangement.
-nnoremap Z :bprev<cr>
-nnoremap X :bnext<cr>
-nnoremap <M-Z> :tabprev<cr>
-nnoremap <M-X> :tabnext<cr>
+" User defined variables used for various plugins (vim-templates, vim-snippets).
+let username = "mvdw"
+let license = "MIT"
+let email = "mvdw at airmail dot cc"
 
-" Pasting and yanking from the system clipboard.
+set termencoding=utf-8 encoding=utf8
+set wmnu wim=list:longest,full wig=*.o,*~,*.pyc,*.tmp title titlestring=%t:%l%r%m
+set titlelen=24 undofile udir=~/.vim/undo,/tmp ul=1024 ur=1024 ss=5 ls=2 nowrap
+set lcs=extends:> tw=80 nu sts=4 shiftwidth=4 ts=4 isk+=- si sta ai hid et tf lz
+set sc cc=80 spr sb nobk ignorecase hls magic noswapfile
+set statusline=%L:%l%=%m[%{Filesize()}]
+
+function! Filesize()
+    let bytes = getfsize(expand("%:p"))
+    return bytes <= 1024 ? (bytes <= 0 ? "0B" : bytes . "B") : (bytes / 1024) . "K"
+endfunc
+
+augroup __filtype
+    au!
+    " Unknown filetypes to vim, some make sense -- others don't.
+    au BufRead,BufNewFile php-fpm*.conf setlocal ft=dosini
+    au BufRead,BufNewFile http*.conf    setlocal ft=apache
+    au BufRead,BufNewFile hosts         setlocal ft=conf
+    au BufRead,BufNewFile *.groff       setlocal ft=groff
+    au BufRead,BufNewFile *.csst        setlocal ft=css
+    au BufRead,BufNewFile *.phpt        setlocal ft=php
+    au BufRead,BufNewFile *.json        setlocal ft=javascript
+    au BufRead,BufNewFile *.conf        setlocal ft=nginx
+    au BufRead,BufNewFile *.ini         setlocal ft=dosini
+    au BufRead,BufNewFile *.log         setlocal ft=conf
+    au BufRead,BufNewFile *.txt         setlocal ft=txt
+    au BufRead,BufNewFile *.tpl         setlocal ft=smarty
+    au BufRead,BufNewFile *.sql         setlocal ft=mysql
+    au BufRead,BufNewFile *.inc         setlocal ft=php
+    au BufRead,BufNewFile *.md          setlocal ft=markdown
+    au BufRead,BufNewFile *.cl          setlocal ft=lisp
+    au BufRead,BufNewFile *.ss          setlocal ft=scheme
+    au BufRead,BufNewFile *.di          setlocal ft=d
+    au BufRead,BufNewFile *.m           setlocal ft=objc
+    au BufRead,BufNewFile *.i           setlocal ft=c
+    au BufRead,BufNewFile *.h           setlocal ft=c
+augroup END
+
+augroup __cursor
+    au!
+    " Return to last edit position when opening files.
+    au BufReadPost *
+        \ if line("'\"") > 0 && line("'\"") <= line("$") |
+        \   exe "normal! g`\"" |
+        \ endif
+augroup END
+
+augroup __save
+    au!
+    " Remove the trailing whitespace whenever you're saving the file.
+    au BufWritePre * :%s/\s\+$//e
+    " Autosave files when focus is lost
+    au FocusLost * :wa
+augroup END
+
 nnoremap <Leader>yy :w !xclip <CR><CR>
 nnoremap <Leader>y :w !xclip <CR><CR>
 nnoremap <Leader>p :r !xclip -o <CR>
+nnoremap <M-Z> :tabprev<cr>
+nnoremap <M-X> :tabnext<cr>
+nnoremap Z :bprev<cr>
+nnoremap X :bnext<cr>
+vnoremap < <gv
+vnoremap > >gv
+nnoremap N Nzz
+nnoremap n nzz
+cnoremap ww w
+cnoremap wW w
+cnoremap Ww w
+cnoremap w; w
+cnoremap W; w
+cnoremap x; x
+cnoremap X; x
+cnoremap w: w
+cnoremap W: w
+cnoremap x: x
+cnoremap X: x
+cnoremap w) w
+cnoremap W) w
+cnoremap x) x
+cnoremap X) x
+nnoremap : ;
+nnoremap ; :
 
-" BufTabLine variables, lets and sets
+" Plugin variables that extend the customisation of an plugin.
 let g:buftabline_indicators=0
-
-" UltiSnips variables, lets and sets
-let g:UltiSnipsExpandTrigger="<TAB>"
-let g:UltiSnipsJumpForwardTrigger="<TAB>"
 let g:UltiSnipsJumpBackwardTrigger="<S-TAB>"
-
-let g:slimv_swank_cmd = '! urxvt -e sbcl --load /home/mvdw/.vim/bundle/slimv/smilestart-swank.lisp &'
-
-" Python-mode variables, lets and sets
-let g:pymode = 1
-let g:pymode_syntax_all = 1
-let g:pymode_warnings = 0
-let g:pymode_indent = 0
-let g:pymode_doc = 1
-let g:pymode_lint = 0
-let g:pymode_rope = 0
-let g:pymode_trim_whitespaces = 1
-let g:pymode_options_max_line_length = 79
-let g:pymode_folding = 0
-let g:pymode_lint = 0
-
-" Syntastic variables, sets and lets.
+let g:UltiSnipsJumpForwardTrigger="<TAB>"
+let g:UltiSnipsExpandTrigger="<TAB>"
+let g:syntastic_python_python_exec = 'python3'
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
