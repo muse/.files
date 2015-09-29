@@ -46,6 +46,10 @@
     --url-align:left !important;        /* The alignment of the text in the url. */
     --url-size-height: 36px!important;  /* Be sure to change this as this will automatically handle
                                            the height issues you might have concerning the content. */
+                                           
+    --toolbarbutton-hover-background: none !important;
+    --toolbarbutton-hover-bordercolor: none !important;
+    --toolbarbutton-hover-boxshadow: none !important;
  
     /* TODO:
        * Dropdown.
