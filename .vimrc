@@ -9,30 +9,26 @@ filetype plugin indent on
 syntax on
 colors autumn
 
-if has("python") && v:version > 700
-    " Extend (append) the original python path with the location of our vim
-    " python scripts. It'll be easier for us to call them later this way.
-    " We're using '__import__' in favor 'import' will discard the sys module
-    " after the path was extended.
-    python __import__("sys").path.append("/home/mvdw/.vim/python")
-
-    " Import on a unique line to be more efficient (otherwise you would import
-    " the module everytime when calling the map).
-    python from pale import Pale
-    nnoremap <C-n> :python Pale().post() <CR>
-endif
-
-" User defined variables used for various plugins (vim-templates, vim-snippets).
-let username = "mvdw"
-let license = "MIT"
-let email = "mvdw at airmail dot cc"
-
 set termencoding=utf-8 encoding=utf8
 set wmnu wim=list:longest,full wig=*.o,*~,*.pyc,*.tmp title titlestring=%t:%l%r%m
 set titlelen=24 undofile udir=~/.vim/undo,/tmp ul=1024 ur=1024 ss=5 ls=2 nowrap
 set lcs=extends:> tw=80 nu sts=4 shiftwidth=4 ts=4 isk+=- si sta ai hid et tf lz
 set sc cc=80 spr sb nobk ignorecase hls magic noswapfile
-set statusline=%L:%l%=%m[%{Filesize()}]
+set statusline=%{Github(branch,repository)}%L:%l%=%m[%{Filesize()}]
+
+" User defined variables used for various plugins (vim-templates, vim-snippets).
+let username = "mvdw"
+let email = "mvdw at airmail dot cc"
+
+" If there's a .git repository, the function will display the current directory
+" name + the branch name. I'm using the directory name instead of the repository
+" name because fetching the latter would be rather inefficient.
+let branch = system("git branch 2>/dev/null | grep '\*'")[2:-2]
+let repository = system("basename `pwd`")[:-2]
+
+function! Github(branch, repository)
+    return strlen(a:branch) == 0 ? "" : "[" . a:repository . ":" . a:branch . "] "
+endfunc
 
 function! Filesize()
     let bytes = getfsize(expand("%:p"))
@@ -110,6 +106,19 @@ cnoremap x) x
 cnoremap X) x
 nnoremap : ;
 nnoremap ; :
+
+if has("python") && v:version > 700
+    " Extend (append) the original python path with the location of our vim
+    " python scripts. It'll be easier for us to call them later this way.
+    " We're using '__import__' in favor of 'import'. This will discard the sys
+    " module after the path was extended.
+    python __import__("sys").path.append("/home/mvdw/.vim/python")
+
+    " Import on a unique line to be more efficient (otherwise you would import
+    " the module everytime when calling the map).
+    python from pale import Pale
+    nnoremap <C-n> :python Pale().post() <CR>
+endif
 
 " Plugin variables that extend the customisation of an plugin.
 let g:buftabline_indicators=0
