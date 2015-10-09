@@ -1,0 +1,16 @@
+# Maintainer: Mirko van der Waal <mvdw at airmail dot cc>
+# Require the necessary environment.
+
+# Display the prompt.
+export PS1='$(prompt \w\ ───\ ) '
+export PS2='> '
+export PS3='\ '
+export PS4='| '
+
+# A set of commonly used applications saved under their selector name.
+export TERMINAL="termite"
+export BROWSER="firefox"
+export EDITOR="vim"
+export LANG="en_GB.UTF-8"
+
+# vim: syntax=sh

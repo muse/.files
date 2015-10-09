@@ -1,26 +1,15 @@
-# Author: Mirko van der Waal
-# Email: <Mvdw at airmail dot cc>
+# Maintainer: Mirko van der Waal <mvdw at airmail dot cc>
+# We do everything from the .profile file. (.bashrc -> .profile -> .shell/*)
 
-# If not running interactively, don't do anything
-[[ $- != *i* ]] && return
+[[ -r ~/.profile ]] && source ~/.profile
 
-xrdb -merge /home/mvdw/.Xresources
+# On modern unices, there's an added complication related to ~/.profile. If you
+# log in in a graphical environment (that is, if the program where you type your
+# password is running in graphics mode), you don't automatically get a login
+# shell that reads ~/.profile. Depending on the graphical login program,
+# on the window manager or desktop environment you run afterwards, and on how
+# your distribution configured these programs, your ~/.profile may or may not
+# be read. If it's not, there's usually another place where you can define
+# environment variables and programs to launch when you log in, but there is
+# unfortunately no standard location.
 
-# export PS1="\[\e[00;34m\]\w\[\e[0m\]\[\e[00;37m\] \[\e[0m\]\[\e[00;34m\]%\[\e[0m\]\[\e[00;37m\] \[\e[0m\]"
-export PS1="\[\033[38;5;12m\]\w\[$(tput sgr0)\]\[\033[38;5;15m\] \[$(tput sgr0)\]\[\033[38;5;12m\]λ\[$(tput sgr0)\]\[\033[38;5;15m\] \[$(tput sgr0)\]"
-export LANG="en_GB.UTF-8"
-export EDITOR="vim"
-export AWESOME="/home/mvdw/.config/awesome"
-export BROWSER="firefox"
-
-alias xmerge="xrdb -merge ~/.Xresources"
-alias vps="ssh mvdw@128.199.46.104"
-alias xip="curl icanhazip.com"
-alias ls="ls -G --color=auto"
-alias la="ls -aG --color=auto"
-alias ix="curl -F 'f:1=<-' ix.io"
-
-# Kill current shell (Leaves no trace of commands.)
-alias kcs="kill -9 $$"		
-# Ports sudo to understand aliases.
-alias sudo="sudo "

@@ -1,0 +1,88 @@
+# Maintainer: Mirko van der Waal <mvdw at airmail dot cc>
+# Functions that make life easier.
+
+# Colorize the arguments excluding the first, which will be used to determite
+# the color to use.
+function color {
+    [[ ${#1} -gt 0 ]] && {
+        local color="$1"
+        shift
+        local content="$@"
+        echo -n "[3${color}m${content}[00m"
+    }
+}
+
+# Colorize the prompt differently regarding the previous exit status.
+function prompt {
+    local C
+	case $? in
+		0)   C=4 ;; # Success
+		1)   C=1 ;; # Error
+		126) C=3 ;; # Cannot execute
+		127) C=5 ;; # Command not found
+        130) C=2 ;; # ^C (Canceled)
+		*)   C=0 ;; # Other
+	esac
+	color "$C" "$(echo "$@" | sed 's/~/\/home\/mvdw/g')"
+}
+
+# Upload text files to ix (http://ix.io) and use the password storage
+# (https://passwordstore.org) for ftp authentication. Omiting (not having) the
+# password entry will do an anonymous upload.
+function ix {
+    local OPTIND
+    local OPTS
+    [[ `pass ftp/mvdw@ix.io` ]] && OPTS='-n'
+    while getopts ":hd:l:i:n:" x; do
+        case $x in
+            d) $echo curl $OPTS -X DELETE ix.io/$OPTARG;
+               return ;;
+            l) curl -s http://ix.io/user/$OPTARG | \
+               grep -Po "\<a href=\"\/[a-zA-Z]*\"\>" | \
+               sed 's/<a href=\"/http:\/\/ix.io/g;s/\">//g'
+               return ;;
+            i) OPTS="$OPTS -X PUT";
+               local id="$OPTARG" ;;
+            n) OPTS="$OPTS -F read:1=$OPTARG" ;;
+        esac
+    done
+    shift $(($OPTIND - 1))
+    [[ -t 0 ]] && {
+        local filename="$1"
+        shift
+        [[ "$filename" ]] && {
+            curl $OPTS -F f:1=@"$filename" $* ix.io/$id
+            return
+        }
+        echo "^C to cancel, ^D to send."
+    }
+    curl $OPTS -F f:1='<-' $* ix.io/$id
+}
+
+# Retrieve the userhash from the password storage (https://passwordstore.org)
+# and send a POST request with the first supplied argument.
+function box {
+    [[ ${#1} -gt 0 ]] && {
+    local H="$1"
+    case "$1" in
+        w) maim -i `xdotool getactivewindow` /tmp/$$.png; H=/tmp/$$.png ;;
+        s) maim -s /tmp/$$.png; H=/tmp/$$.png ;;
+    esac
+    curl -F filesToUpload="@$H" -F userhash="`pass hash/0x@catbox.moe`" \
+         http://catbox.moe/user/do_upload.php && echo -e "\000"
+    }
+}
+
+# Generate a random key. You can specify the length ($1) and the characters ($2).
+# Omitting the second argument will allow a set of all printable ASCII characters.
+function key {
+    [[ ${#1} -gt 0 ]] && {
+        [[ -z $2 ]] && {
+            tr -dc '[{(<=_:;$%^&A-Za-z0-9~!@#*+,.->)}]' < /dev/urandom | head -c $1 | xargs
+        } || {
+            tr -dc "$2" < /dev/urandom | head -c $1 | xargs
+        }
+    }
+}
+
+# vim: syntax=sh
