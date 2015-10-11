@@ -1,0 +1,210 @@
+#! /usr/bin/env sh
+#  Author: Mirko van der Waal
+#  Mail: <mvdw at airmail dot cc>
+#  Distributed under terms of the GPL license.
+#
+#  Copyright (C) 2015
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, see <http://www.gnu.org/licenses/>.
+
+SHORT="cpla:r:h"
+LONG="construct,list,pull,clone,add:,remove:,help,vim:,bundle:"
+OPTIONS=$(getopt -o $(echo $SHORT) \
+                 -l $(echo $LONG) \
+                 -n "$0" \
+                 -- "$@")
+
+# The .vim directory.
+vim=$HOME/.vim
+
+# Extend the previously obtained path to locate the /bundle directory.
+bundle=$vim/bundle
+
+# Extend the previously obtained path to place the plugins.conf file.
+location=$vim/plugins.conf
+
+# Create the existing plugin entries array.
+[[ -r $location ]] && entries=(`cat $location`) || entries=()
+
+function construct {
+    for directory in $bundle/*; do
+        local list="$list `cat $directory/.git/config 2>/dev/null | grep url | sed 's/.*= //g;s/\.git//g'`"
+    done
+    if [[ -r $location ]]; then
+        read -p "You're about to overwrite the exisiting file. [y/N] " boolean
+    fi
+    if [[ ${boolean^^} == "Y" || ! -e $location ]]; then
+        tr ' ' '\n\r' <<< $list > $location
+        echo "Successfully constructed the new file."
+    else
+        echo "Bye then!"
+    fi
+    exit 0
+}
+
+function clone {
+    local missing=($(echo `ls $bundle` `sed 's/\(.*\)\/\(.*\)/\2/' $location` | tr ' ' '\n' | sort | uniq -u))
+    case ${#missing[@]} in
+        0)
+            echo "You're up to date."
+            exit 0
+            ;;
+        *)
+            read -p "Plugins (${#missing[@]}): ${missing[@]}. [y/N] " boolean
+            if [[ ${boolean^^} == "Y" ]]; then
+                for miss in ${missing[@]}; do
+                    git clone `cat $location | grep $miss` $bundle/$miss
+                done
+                echo "Successfully cloned all the missing repositories."
+            fi
+            exit 0
+            ;;
+    esac
+    exit 0
+}
+
+function pull {
+    for directory in $bundle/*; do
+        if [[ -d $directory/.git ]]; then
+            cd $directory && echo "$directory --> `git pull`"
+        fi
+    done
+    exit 0
+}
+
+function add {
+    local post=`curl --silent --head --fail "$1"`
+    case `grep -Po "Status: [0-9]*" <<< $post | sed 's/Status: //g'` in
+        200|304)
+            for entry in $entries; do
+                if [[ $1 == $entry ]]; then
+                    echo "You\'re already watching this plugin.";
+                    exit 0
+                fi
+            done && echo $1 >> $location || exit 0
+            echo "Now watching: $1"
+            break
+            ;;
+        *)
+            echo "Invalid URL: $1"
+            break
+            ;;
+    esac
+    exit 0
+}
+
+function remove {
+    echo "Looking for matches..."
+    for entry in ${entries[@]}; do
+        if [[ ${entry,,} =~ ${1,,} ]]; then
+            remove=("${remove[@]}" `sed 's/\(.*\)\/\(.*\)/\2/' <<< $entry`)
+        fi
+    done
+    if [[ ${#remove[@]} -le 0 ]]; then
+        echo "No matches found."
+        exit 0
+    fi
+    echo "Plugins (${#remove[@]}): ${remove[@]}"
+    read -p "Continue removal? [y/N] " boolean
+    if [[ ${boolean^^} == "Y" ]]; then
+        for plugin in ${remove[@]}; do
+            echo "Removing: $plugin"
+            rm -rf $bundle/$plugin
+            sed -i "s-`cat $location | grep $plugin | head -n1`--g" $location
+        done
+    fi
+    echo "Removal successful."
+    exit 0
+}
+
+function list {
+    echo "Found (${#entries[@]}) plugins."
+    for entry in ${entries[@]}; do
+        echo "$entry"
+    done
+}
+
+while true; do
+    case "$1" in
+        --construct)
+            construct
+            break ;;
+        -r|--remove)
+            remove $2
+            shift 2 ;;
+        -a|--add)
+            add $2
+            shift 2 ;;
+        -c|--clone)
+            clone
+            shift ;;
+        -p|--pull)
+            pull
+            shift ;;
+        -l|--list)
+            list
+            break ;;
+        -h|--help)
+            echo "
+$(tput bold)NAME$(tput sgr0)
+    Praeter - Small vim plugin wrapper.
+
+$(tput bold)SYNOPSIS$(tput sgr0)
+    praetor $(tput bold)[options]$(tput sgr0)
+
+$(tput bold)DESCRIPTION$(tput sgr0)
+    Manage your vim plugins through a simple shell script. Praeter doesn't
+    directly interact with vim making it easy to seperate the two.
+
+$(tput bold)OPTIONS$(tput sgr0)
+    $(tput bold)-a, --add $(tput sgr0;tput smul)[ARGUMENT...]$(tput sgr0)
+        Add a new repository to the .conf file. This does not automatically
+        clone it yet. You will have to --clone before it becomes available.
+
+    $(tput bold)-c, --clone$(tput sgr0)
+        Clone all the not yet cloned repositories to the /bundle directory.
+
+    $(tput bold)--construct$(tput sgr0)
+        Construct a plugins.conf file from the existing plugins in /bundle.
+        If you haven't used praeter yet, you might want to do this.
+
+    $(tput bold)-h, --help$(tput sgr0)
+        You're looking at it.
+
+    $(tput bold)-l, --list$(tput sgr0)
+        List the amount and all the currently used plugins.
+
+    $(tput bold)-p, --pull$(tput sgr0)
+        Perform a pull request to the master branch of all the ALREADY cloned
+        repositories.
+
+    $(tput bold)-r, --remove $(tput sgr0;tput smul)[ARGUMENT...]$(tput sgr0)
+        Remove all the repositories matching the expression.
+
+$(tput bold)FUTURE$(tput sgr0)
+    * Allow to recieve plugins from other locations.
+    * Specify custom --pull or --clone flags on repositories.
+
+$(tput bold)ISSUES$(tput sgr0)
+    None, let me know though. No really. Let me know.
+
+$(tput bold)CONTACT$(tput sgr0)
+    Mirko van der Waal <mvdw at airmail dot cc>
+            "
+            exit  ;;
+        --) shift
+            break ;;
+        * ) break ;;
+    esac
+done
