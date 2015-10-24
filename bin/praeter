@@ -18,8 +18,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-SHORT="cpla:r:h"
-LONG="construct,list,pull,clone,add:,remove:,help,vim:,bundle:"
+SHORT="cpla:r:v:b:d:h"
+LONG="construct,list,pull,clone,add:,remove:,help,vim:,bundle:,database:"
 OPTIONS=$(getopt -o $(echo $SHORT) \
                  -l $(echo $LONG) \
                  -n "$0" \
@@ -27,19 +27,16 @@ OPTIONS=$(getopt -o $(echo $SHORT) \
 
 # The .vim directory.
 vim=$HOME/.vim
-
 # Extend the previously obtained path to locate the /bundle directory.
 bundle=$vim/bundle
-
 # Extend the previously obtained path to place the plugins.conf file.
-location=$vim/plugins.conf
-
+location=$vim/plugins.db
 # Create the existing plugin entries array.
 [[ -r $location ]] && entries=(`cat $location`) || entries=()
 
 function construct {
     for directory in $bundle/*; do
-        local list="$list `cat $directory/.git/config 2>/dev/null | grep url | sed 's/.*= //g;s/\.git//g'`"
+        local list="$list `grep "url" $directory/.git/config 2>/dev/null | sed 's/.*= //g;s/\.git//g'`"
     done
     if [[ -r $location ]]; then
         read -p "You're about to overwrite the exisiting file. [y/N] " boolean
@@ -61,10 +58,11 @@ function clone {
             exit 0
             ;;
         *)
+            echo "${missing[@]}"
             read -p "Plugins (${#missing[@]}): ${missing[@]}. [y/N] " boolean
             if [[ ${boolean^^} == "Y" ]]; then
                 for miss in ${missing[@]}; do
-                    git clone `cat $location | grep $miss` $bundle/$miss
+                    git clone `grep "$miss" $location` $bundle/$miss
                 done
                 echo "Successfully cloned all the missing repositories."
             fi
@@ -121,10 +119,12 @@ function remove {
         for plugin in ${remove[@]}; do
             echo "Removing: $plugin"
             rm -rf $bundle/$plugin
-            sed -i "s-`cat $location | grep $plugin | head -n1`--g" $location
+            sed -i "s/$(grep -m1 "$plugin" $location | sed 's/\//\\\//g')//g" $location
         done
+        echo "Removal successful."
+    else
+        echo "Did nothing."
     fi
-    echo "Removal successful."
     exit 0
 }
 
@@ -135,6 +135,24 @@ function list {
     done
 }
 
+function database {
+    if [[ "${#1}" -gt 0 ]]; then
+        location="$1"
+    fi
+}
+
+function bundle {
+    if [[ "${#1}" -gt 0 ]]; then
+        bundle="$1"
+    fi
+}
+
+function vim {
+    if [[ "${#1}" -gt 0 ]]; then
+        vim="$1"
+    fi
+}
+
 while true; do
     case "$1" in
         --construct)
@@ -142,6 +160,16 @@ while true; do
             break ;;
         -r|--remove)
             remove $2
+            shift 2 ;;
+        -b|--bundle)
+            bundle $2
+            shift 2 ;;
+        -v|--vim)
+            vim $2
+            shift 2 ;;
+        -d|--database)
+            echo "$@"
+            database $2
             shift 2 ;;
         -a|--add)
             add $2
@@ -158,7 +186,7 @@ while true; do
         -h|--help)
             echo "
 $(tput bold)NAME$(tput sgr0)
-    Praeter - Small vim plugin wrapper.
+    Praeter - Bundle manager for vim.
 
 $(tput bold)SYNOPSIS$(tput sgr0)
     praetor $(tput bold)[options]$(tput sgr0)
@@ -169,14 +197,24 @@ $(tput bold)DESCRIPTION$(tput sgr0)
 
 $(tput bold)OPTIONS$(tput sgr0)
     $(tput bold)-a, --add $(tput sgr0;tput smul)[ARGUMENT...]$(tput sgr0)
-        Add a new repository to the .conf file. This does not automatically
+        Add a new repository to the watchlist. This does not automatically
         clone it yet. You will have to --clone before it becomes available.
+
+    $(tput bold)-b, --bundle $(tput sgr0;tput smul)[ARGUMENT...]$(tput sgr0)
+        Set the location of the /bundle directory located in your .vim
+        directory. Using this flag together with the --vim flag could result in
+        undesired behaviour.
 
     $(tput bold)-c, --clone$(tput sgr0)
         Clone all the not yet cloned repositories to the /bundle directory.
 
+    $(tput bold)-d, --database $(tput sgr0;tput smul)[ARGUMENT...]$(tput sgr0)
+        Have the current session run with said database file. This could be
+        useful for when you quickly want to clone various repositories from
+        other files.
+
     $(tput bold)--construct$(tput sgr0)
-        Construct a plugins.conf file from the existing plugins in /bundle.
+        Construct a plugins.db file from the existing plugins in /bundle.
         If you haven't used praeter yet, you might want to do this.
 
     $(tput bold)-h, --help$(tput sgr0)
@@ -192,9 +230,17 @@ $(tput bold)OPTIONS$(tput sgr0)
     $(tput bold)-r, --remove $(tput sgr0;tput smul)[ARGUMENT...]$(tput sgr0)
         Remove all the repositories matching the expression.
 
+    $(tput bold)-v, --vim $(tput sgr0;tput smul)[ARGUMENT...]$(tput sgr0)
+        Set the .vim directory. This automatically helps extending the --bundle
+        directory since that is a child of .vim. Using both of the flags could
+        conflict and result in undesired behaviour.
+
 $(tput bold)FUTURE$(tput sgr0)
-    * Allow to recieve plugins from other locations.
-    * Specify custom --pull or --clone flags on repositories.
+    ; Allow to recieve plugins from other locations.
+
+    ; Specify custom --pull or --clone flags on repositories.
+
+    ; Automatically stash/merge when there are conflicting versions.
 
 $(tput bold)ISSUES$(tput sgr0)
     None, let me know though. No really. Let me know.

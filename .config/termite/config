@@ -1,0 +1,50 @@
+[options]
+scroll_on_output    = false
+scroll_on_keystroke = true
+audible_bell        = false
+mouse_autohide      = false
+allow_bold          = true
+dynamic_title       = true
+urgent_on_bell      = true
+clickable_url       = true
+font                = Liberation Mono 8
+scrollback_lines    = 12800
+search_wrap         = true
+
+# If you want the cursor to blink or not ("off", "on").
+cursor_blink = off
+
+# ("block", "underline" or "ibeam").
+cursor_shape = block
+
+# Set size hints for the window
+size_hints   = true
+
+# emit escape sequences for other keys modified by Control
+# modify_other_keys = false
+
+[colors]
+foreground_bold = #746C48
+foreground = #746C48
+background = #170F0D
+cursor = #6BA16C
+
+# You can set any amount of colors from 0 to 254.
+color0 = #392925
+color1 = #98724C
+color2 = #908F32
+color3 = #AA964C
+color4 = #7B854E
+color5 = #6B5644
+color6 = #5C5142
+color7 = #C8B55B
+color8 = #544B2E
+color9 = #AF652F
+color10 = #C3C13D
+color11 = #C8B55B
+color12 = #70A16C
+color13 = #98724C
+color14 = #778725
+color15 = #E4DC8C
+
+# vim: ft=dosini cms=#%s
