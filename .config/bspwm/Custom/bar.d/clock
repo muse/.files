@@ -1,0 +1,4 @@
+echo "hey"
+for u in a b c; do
+    echo $u
+done

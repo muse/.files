@@ -1,0 +1,43 @@
+; The [bar] section is reserved and used by the bar script. It contains the
+; variables bound to the script and should not be mirrored to any file in the
+; bar.d directory.
+
+; From the manual page of config parser.
+; A configuration file consists of sections, each led by a [section] header,
+; followed by key/value entries separated by a specific string (= or : by default).
+; By default, section names are case sensitive but keys are not. Leading and
+; trailing whitespace is removed from keys and values. Values can be omitted,
+; in which case the key/value delimiter may also be left out. Values can also
+; span multiple lines, as long as they are indented deeper than the first line
+; of the value. Depending on the parser’s mode, blank lines may be treated
+; as parts of multiline values or ignored.
+
+; Configuration files may include comments, prefixed by specific characters
+; (# and ; by default). Comments may appear on their own on an otherwise
+; empty line, possibly indented.
+
+[bar]
+background = "#FFFEFEFE"
+foreground = "#FF313930"
+height = 20
+reload = 1
+fonts = "-wuncon-siji-medium-r-normal--10-100-75-75-c-80-iso10646-1"
+        "Lemon-8"
+
+[clock]
+foreground = "#FF000FFF"
+background = "#FF000EEE"
+position = "center:left"
+display = true
+events = "1:ls"
+         "2:cat"
+         "3:nl"
+         "4:grep"
+         "5:ps"
+
+[battery]
+foreground = "#FF000DDD"
+background = "#FF000BBB"
+position = "right:right"
+display = false
+
