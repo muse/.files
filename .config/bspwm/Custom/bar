@@ -68,7 +68,7 @@ stack() {
         if [[ ${#@} -ge 1 ]]; then
             case $1 in
                 construct)
-                    printf "%s" "bar:" {A..V} {X..Z} $'\n' >> $stack_p
+                    printf "%s" "bar:" {A..Z} $'\n' >> $stack_p
                     for section in bar.d/*; do
                         printf "%s" "$(basename $section):" {A..E} $'\n' >> $stack_p
                     done
@@ -96,10 +96,39 @@ stack() {
 stack construct
 
 # Does this need revision? No.
+handle() {
+    # Catch string from stdout and execute the matching commands.
+    while read -r line; do
+        local cmd=${handle[$line]}
+        if [[ ! -z $cmd ]]; then
+            echo "$cmd &"
+        fi
+    done
+}
+
+# This is the part that needs work. Hardcoded for now.
+format() {
+    while read -r line; do
+        case $line in
+            A*)
+                a="${line#?}"
+                ;;
+            B*)
+                b="${line#?}"
+                ;;
+        esac
+        printf "%s\n" "${a}%{c}${b}%{r}"
+    done
+}
+
+# Does this need revision? No.
 {
     # Set the a default choice for every variable that is not defined.
     declare -A choice
-    choice=([foreground]="#FFFFFFFF" [background]="#00FFFFFF" [position]="left:left" [display]=false)
+    choice=([foreground]="#FFFFFFFF"
+            [background]="#FF000000"
+            [position]="left:left"
+            [display]=false)
     for file in bar.d/*; do
         name=$(basename $file)
         for section in "${!choice[@]}"; do
@@ -120,12 +149,14 @@ stack construct
     for file in bar.d/*; do
         name=$(basename $file)
         if [[ $(eval "echo \${#${name}_events[@]}") -gt 0 ]]; then
-            for event in $(eval "echo \${${name}_events[@]}"); do
+            for event in "$(eval "echo \${${name}_events[@]}")"; do
                 IFS=':' read -a event <<< "$event"
                 uid="$(stack retrieve ${name})${name}"
-                eval "area[${name}_p]='${area[${name}_p]}${event_p}%{A${event[0]}:${uid}}'"
+                eval "area[${name}_p]='${area[${name}_p]}${event_p}%{A${event[0]}:${uid}:}'"
                 eval "area[${name}_s]='${area[${name}_s]}%{A}'"
-                eval "handle[${uid}]=${event[1]}"
+                eval "handle[${uid}]=\"${event[1]}\""
+                echo ${uid}
+                echo ${handle[${uid}]}
             done
         else
             echo "Main: No events specified for '${name}' -> using none."
@@ -133,43 +164,37 @@ stack construct
     done
 } 2>&3
 
-# Does this need revision? Yes.
+# Does this need revision? Likely.
 {
-    declare -A section
     # Parse our previously collected elements to a full string.
+    declare -A section
     if [[ -e $process_p ]]; then
         rm $process_p
     fi
     mkfifo "$process_p"
+    bspc config top_padding $bar_height
     for file in bar.d/*; do
         name=$(basename $file)
-        if [[ $(eval "echo \${${name}_display}")=true ]]; then
-            s_areas="$(eval "echo \${area[${name}_p]"})"
-            s_areap="$(eval "echo \${area[${name}_s]"})"
-            s_stack=$(stack retrieve)
-            s_fg="%{F$(eval "echo \${${name}_foreground}")}"
-            s_bg="%{B$(eval "echo \${${name}_background"})}"
-            s_content="$(tr '\n' ' ' < <(bash < $file))"
-            s_suffix="%{F-}%{B-}"
+        if [[ $(eval "echo \${${name}_display}") = true ]]; then
+            uid=$(stack retrieve)
+            #echo "$(eval "echo \${${name}_position"})}"
             while :; do
                 printf "%s" \
-                    "$(stack retrieve)" \
+                    "$uid" \
                     "$(eval "echo \${area[${name}_p]"})" \
                     "%{F$(eval "echo \${${name}_foreground}")}" \
-
-                    "${s_stack}${s_areas}${s_fg}${s_bg}${s_content}${s_suffix}${s_areap}"
+                    "%{B$(eval "echo \${${name}_background"})}" \
+                    "$(tr '\n' ' ' < <(bash < $file))" \
+                    "%{F-}%{B-}" \
+                    "$(eval "echo \${area[${name}_s]"})" \
+                    $'\n'
                 sleep $bar_reload
             done > "$process_p" &
+        else
+            echo "Main: ${name} is set not to display."
         fi
     done
 } 2>&3
 
-cat < $process_p
-
-exit 0
-
-#
-#
-# This is a WIP. It is not yet functional. Please keep that in mind.
-#
-#
+cat "$process_p" | format | lemonbar | handle | sh
+wait

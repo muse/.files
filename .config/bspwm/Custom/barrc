@@ -1,8 +1,3 @@
-; The [bar] section is reserved and used by the bar script. It contains the
-; variables bound to the script and should not be mirrored to any file in the
-; bar.d directory.
-
-; From the manual page of config parser.
 ; A configuration file consists of sections, each led by a [section] header,
 ; followed by key/value entries separated by a specific string (= or : by default).
 ; By default, section names are case sensitive but keys are not. Leading and
@@ -16,6 +11,10 @@
 ; (# and ; by default). Comments may appear on their own on an otherwise
 ; empty line, possibly indented.
 
+; The [bar] section is reserved and used by the bar script. It contains the
+; variables bound to the script and should not be mirrored to any file in the
+; bar.d directory.
+
 [bar]
 background = "#FFFEFEFE"
 foreground = "#FF313930"
@@ -24,20 +23,18 @@ reload = 1
 fonts = "-wuncon-siji-medium-r-normal--10-100-75-75-c-80-iso10646-1"
         "Lemon-8"
 
+; Anything below here is defined by the user.
+
 [clock]
-foreground = "#FF000FFF"
-background = "#FF000EEE"
+foreground = "#FF333333"
+background = "#FF000FFF"
 position = "center:left"
 display = true
-events = "1:ls"
-         "2:cat"
-         "3:nl"
-         "4:grep"
-         "5:ps"
+events = "1:notify-send 'Hi'"
 
 [battery]
 foreground = "#FF000DDD"
 background = "#FF000BBB"
-position = "right:right"
-display = false
+position = "right:left"
+display = true
 
