@@ -59,6 +59,15 @@ augroup __filtype
     au BufRead,BufNewFile *.m           setlocal ft=objc
     au BufRead,BufNewFile *.i           setlocal ft=c
     au BufRead,BufNewFile *.h           setlocal ft=c
+
+    " Enable rainbow parentheses when writing lisp.
+    au VimEnter *.lsp,*.lisp RainbowParenthesesToggle
+    au Syntax *.lsp,*.lisp   RainbowParenthesesLoadRound
+    au Syntax *.lsp,*.lisp   RainbowParenthesesLoadSquare
+    au Syntax *.lsp,*.lisp   RainbowParenthesesLoadBraces
+
+    " Apply a tabwidth of 2 when writing lisp.
+    au BufRead,BufNewFile *.lsp,*.lisp set tabstop=4 softtabstop=0 shiftwidth=2
 augroup END
 
 augroup __cursor
@@ -119,6 +128,9 @@ if has("python") && v:version > 700
     python from pale import Pale
     nnoremap <C-n> :python Pale().post() <CR>
 endif
+
+" Mapping this will produce the output.
+" :call Squid()
 
 " Plugin variables that extend the customisation of an plugin.
 let g:buftabline_indicators=0
