@@ -18,8 +18,8 @@
 [bar]
 background = "#FFFEFEFE"
 foreground = "#FF313930"
+position = "battery|clock|battery:battery"
 height = 20
-reload = 1
 fonts = "-wuncon-siji-medium-r-normal--10-100-75-75-c-80-iso10646-1"
         "Lemon-8"
 
@@ -28,13 +28,13 @@ fonts = "-wuncon-siji-medium-r-normal--10-100-75-75-c-80-iso10646-1"
 [clock]
 foreground = "#FF333333"
 background = "#FF000FFF"
-position = "center:left"
 display = true
-events = "1:notify-send 'Hi'"
+; events = "1:notify-send 'Hi'"
+reload = 1
 
 [battery]
 foreground = "#FF000DDD"
 background = "#FF000BBB"
-position = "right:left"
 display = true
+reload = 10
 
