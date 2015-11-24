@@ -1,8 +1,17 @@
 #! /bin/env bash
-# Author: <mvdw at airmail dot cc> 
+# Author: <mvdw at airmail dot cc>
 
-# Only works when you use rxvt-unicode and have applicable .Xresources file.
-SCHEME() { cat $HOME/.Xresources|grep ^URxvt.color[0-9]|grep r$1:|awk '{print$(NF)}'; }
+if [[ $TERM == "xterm-termite" ]]; then
+    SCHEME() {
+        cat $HOME/.config/termite/config|grep color[0-9]|tr -d ' '|grep r$1\=|head -n1|cut -d= -f2;
+    }
+elif [[ $TERM =~ "rxvt-unicode-" ]]; then
+    SCHEME() {
+        cat $HOME/.Xresources|grep *.color[0-9]|sed 's/ //g'|grep r1\:|head -n1|cut -d: -f2;
+    }
+else
+    echo "No valid terminal found"; exit;
+fi
 
 F=3 B=4
 for J in F B; do
