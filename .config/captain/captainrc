@@ -1,0 +1,64 @@
+; A configuration file consists of sections, each led by a [section] header,
+; followed by key/value entries separated by a specific string (= or : by default).
+
+; trailing whitespace is removed from keys and values. Values can be omitted,
+; in which case the key/value delimiter may also be left out. Values can also
+; span multiple lines, as long as they are indented deeper than the first line
+; of the value. Depending on the parser’s mode, blank lines may be treated
+; as parts of multiline values or ignored.
+
+; Configuration files may include comments, prefixed by specific characters
+; (# and ; by default). Comments may appear on their own on an otherwise
+; empty line, possibly indented.
+
+; The [bar] section is reserved and used by the bar script. It contains the
+; variables bound to the script and should not be mirrored to any file in the
+; captain.d directory.
+
+[bar]
+background = "#FF141314"
+foreground = "#FF666666"
+format = "window|clock|music:volume:battery:network"
+height = 20
+fonts = "Lemon-8"
+        "-wuncon-siji-medium-r-normal--10-100-75-75-c-80-iso10646-1"
+dock = "bottom"
+offset = 0
+
+; Anything below here is defined by the user.
+
+[window]
+manual = true
+passive = '#FF333333'
+focused = '#FF666666'
+reload = 0.1
+
+[clock]
+background = "#FF141314"
+foreground = "#FF666666"
+reload = 5
+
+[music]
+mouse-left = "termite -e 'ncmpcpp'"
+background = "#FF141314"
+foreground = "#FF666666"
+reload = 0.5
+
+[volume]
+mouse-left = "termite -e 'alsamixer'"
+background = "#FF141314"
+foreground = "#FF666666"
+reload = 0.5
+
+[battery]
+background = "#FF141314"
+foreground = "#FF666666"
+reload = 0.5
+
+[network]
+mouse-left = "termite -e 'nmtui'"
+background = "#FF141314"
+foreground = "#FF666666"
+reload = 0.5
+
+; vim:syntax=dosini
