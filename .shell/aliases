@@ -1,23 +1,15 @@
 # Maintainer: Mirko van der Waal <mvdw at airmail dot cc>
-# Set new application defaults.
 
 # Directory switching/listing related aliases.
-alias ls="ls -G --color=auto --group-directories-first"
+alias ls="ls -G --group-directories-first --color=auto"
 alias ll='ls -lhoGg --color=auto'
 alias la="ls -a --color=auto"
 
-# Ask for confirmation whenever you're (re)moving files.
+# Ask for confirmation whenever we're (re)moving files.
 alias rm="rm -i"
 alias mv="mv -i"
 
 # Have sudo understand aliases.
 alias sudo="sudo "
-
-# Inner- & outer IP.
-alias ipi="ip addr show | grep -E 'inet' | grep -m 1 global | cut -d\  -f6"
-alias ipo="curl icanhazip.com"
-
-# Kill the current terminal without saving the actions performed in it.
-alias kn="kill -9 $$"
 
 # vim: syntax=sh

@@ -1,30 +1,4 @@
 # Maintainer: Mirko van der Waal <mvdw at airmail dot cc>
-# Functions that make life easier.
-
-# Colorize the arguments excluding the first, which will be used to determite
-# the color to use.
-function color {
-    [[ ${#1} -gt 0 ]] && {
-        local color="$1"
-        shift
-        local content="$@"
-        echo -n "[3${color}m${content}[00m"
-    }
-}
-
-# Colorize the prompt differently regarding the previous exit status.
-function prompt {
-    local C
-	case $? in
-		0)   C=4 ;; # Success
-		1)   C=1 ;; # Error
-		126) C=3 ;; # Cannot execute
-		127) C=5 ;; # Command not found
-        130) C=2 ;; # ^C (Canceled)
-		*)   C=0 ;; # Other
-	esac
-	color "$C" "$(echo "$@" | sed 's/~/\/home\/mvdw/g')"
-}
 
 # Upload text files to ix (http://ix.io) and use the password storage
 # (https://passwordstore.org) for ftp authentication. Omiting (not having) the
@@ -32,7 +6,7 @@ function prompt {
 function ix {
     local OPTIND
     local OPTS
-    [[ `pass ftp/mvdw@ix.io` ]] && OPTS='-n'
+    [[ -r ~/.netrc ]] && OPTS='-n'
     while getopts ":hd:l:i:n:" x; do
         case $x in
             d) $echo curl $OPTS -X DELETE ix.io/$OPTARG;
@@ -57,32 +31,53 @@ function ix {
         echo "^C to cancel, ^D to send."
     }
     curl $OPTS -F f:1='<-' $* ix.io/$id
+} && export -f ix
+
+# Get your address.
+address() {
+    case "$1" in
+        out) curl "icanhazip.com" ;;
+        in) ip addr show | awk '/inet.*global/{print $2}' ;;
+    esac
 }
 
+# Find the closest match to the search query from the current playlist and play
+# this song.
+song() {
+    mpc playlist | nl | grep -i "$@" | awk '{print $1}' | head -1 | xargs mpc play
+} && export -f song
+
 # Retrieve the userhash from the password storage (https://passwordstore.org)
-# and send a POST request with the first supplied argument.
-function box {
-    [[ ${#1} -gt 0 ]] && {
-    local H="$1"
+# and validate the first argument as flag. Then send a POST request to a host.
+box() {
+    local file=${2:-"$(($RANDOM * 128)).png"}
     case "$1" in
-        w) maim -i `xdotool getactivewindow` /tmp/$$.png; H=/tmp/$$.png ;;
-        s) maim -s /tmp/$$.png; H=/tmp/$$.png ;;
+        -w|--window) maim -i `xdotool getactivewindow` /tmp/$file ;;
+        -s|--selection) maim -s /tmp/$file ;;
+        -f|--fullscreen) maim /tmp/$file ;;
+        -u|--upload) cp $file /tmp/$file ;;
     esac
-    curl -F filesToUpload="@$H" -F userhash="`pass hash/0x@catbox.moe`" \
-         http://catbox.moe/user/do_upload.php && echo -e "\000"
-    }
-}
+    if [[ -f /tmp/$file ]]; then
+        curl \
+            -F userhash="`pass hash/0x@catbox.moe`" \
+            -F fileToUpload="@/tmp/$file" \
+            -F reqtype="fileupload" \
+            http://catbox.moe/user/api.php
+        rm -f /tmp/$file
+    fi
+} && export -f box
 
 # Generate a random key. You can specify the length ($1) and the characters ($2).
 # Omitting the second argument will allow a set of all printable ASCII characters.
-function key {
-    [[ ${#1} -gt 0 ]] && {
-        [[ -z $2 ]] && {
-            tr -dc '[{(<=_:;$%^&A-Za-z0-9~!@#*+,.->)}]' < /dev/urandom | head -c $1 | xargs
-        } || {
-            tr -dc "$2" < /dev/urandom | head -c $1 | xargs
-        }
-    }
-}
+key() {
+    if [[ -z $2 ]]; then
+        tr -dc "$(
+            for character in {33..127}; do
+                printf \\$(printf '%03o' $character)
+            done)" < /dev/urandom | head -c $1 | xargs
+    else
+        tr -dc "$2" < /dev/urandom | head -c $1 | xargs
+    fi
+} && export -f key
 
 # vim: syntax=sh
